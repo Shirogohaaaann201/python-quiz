@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python 練習問題</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        #quiz-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        /* ヘッダー部分（問題数とスコアを左右に配置） */
+        .header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        h2 { margin: 0; font-size: 1.2em; color: #0056b3; }
+        #score-display {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        pre {
+            background-color: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-align: left;
+        }
+        .btn:hover:not(:disabled) { background-color: #d0d0d0; }
+        .btn:disabled { cursor: default; opacity: 0.9; }
+        .btn.correct { background-color: #4CAF50; color: white; font-weight: bold; }
+        .btn.incorrect { background-color: #F44336; color: white; }
+        
+        /* 「次へ」ボタン専用のスタイル */
+        #next-btn {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none; /* 初期状態では隠す */
+        }
+        #next-btn:hover { background-color: #0056b3; }
+
+        #end-screen { text-align: center; display: none; }
+        .final-score-text {
+            font-size: 1.5em;
+            color: #e91e63;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        #restart-btn {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #restart-btn:hover { background-color: #0056b3; }
+        
+        /* モード選択画面 */
+        #mode-selection-screen { text-align: center; display: none; }
+        #random-selection-screen { display: none; }
+        /* クイズ画面と終了画面を初期状態で非表示 */
+        #question-screen { display: none; }
+        .mode-intro {
+            font-size: 1.3em;
+            color: #0056b3;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .mode-btn {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            padding: 20px 40px;
+            font-size: 1.2em;
+            margin: 15px auto;
+            width: 80%;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .mode-btn:hover { background-color: #0056b3; }
+        .mode-btn-description {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* 問題選択画面 */
+        #question-selection-screen { display: none; }
+        .selection-header {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #0056b3;
+            font-weight: bold;
+        }
+        .selection-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .selection-controls button {
+            padding: 8px 15px;
+            font-size: 0.9em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #select-all-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        #select-all-btn:hover { background-color: #0b7dda; }
+        #deselect-all-btn {
+            background-color: #757575;
+            color: white;
+        }
+        #deselect-all-btn:hover { background-color: #616161; }
+        #back-to-mode-btn {
+            background-color: #ff9800;
+            color: white;
+        }
+        #back-to-mode-btn:hover { background-color: #e68900; }
+        .question-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .question-checkbox {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9em;
+            text-align: center;
+        }
+        .question-checkbox input[type="checkbox"] {
+            margin-right: 3px;
+            cursor: pointer;
+        }
+        .question-checkbox:hover {
+            background-color: #f0f0f0;
+            border-color: #0056b3;
+        }
+        .selection-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        #start-quiz-btn {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        #start-quiz-btn:hover:not(:disabled) { background-color: #45a049; }
+        #start-quiz-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        /* 正誤結果バッジ */
+        .question-result-badge {
+            font-size: 0.75em;
+            font-weight: bold;
+            margin-left: 3px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        .result-correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .result-incorrect {
+            background-color: #F44336;
+            color: white;
+        }
+        
+        /* 出題画面の直近結果表示 */
+        #last-result-display {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-left: 4px solid #0056b3;
+            background-color: #f0f7ff;
+            display: none;
+        }
+        #last-result-display.show {
+            display: block;
+        }
+        
+        /* クリアボタン */
+        #clear-history-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.8em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #clear-history-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <!-- モード選択画面 -->
+    <div id="mode-selection-screen">
+        <div class="mode-intro">
+            <h2>Python 練習問題</h2>
+            <p>どのモードで挑戦しますか？</p>
+            <button id="clear-history-btn" onclick="clearHistory()">📋 正誤履歴をクリア</button>
+        </div>
+        <button class="mode-btn" onclick="selectRandomMode()">
+            🎲 ランダムモード
+            <div class="mode-btn-description">15問がランダムに選ばれます</div>
+        </button>
+        <button class="mode-btn" onclick="selectChoiceMode()">
+            ✓ 問題選択モード
+            <div class="mode-btn-description">問題を自分で選んで挑戦できます</div>
+        </button>
+    </div>
+
+    <!-- ランダムモード問題数選択画面 -->
+    <div id="random-selection-screen">
+        <div class="selection-header">ランダムモード</div>
+        <div class="selection-info">
+            出題する問題数を選択してください（1～50問）
+        </div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <input type="number" id="random-question-count" min="1" max="50" value="15" style="padding: 8px; font-size: 1em; width: 100px; text-align: center;">
+            <p style="font-size: 0.9em; color: #666;">問題数</p>
+        </div>
+        <div class="selection-controls">
+            <button id="start-random-btn" onclick="startQuizRandom()">この問題数で挑戦開始</button>
+            <button id="back-to-mode-from-random-btn" onclick="backToMode()">戻る</button>
+        </div>
+    </div>
+
+    <!-- 問題選択画面 -->
+    <div id="question-selection-screen">
+        <div class="selection-header">問題選択モード</div>
+        <div class="selection-info">
+            問題を選択してください（現在: <span id="selected-count">0</span>問選択中）
+        </div>
+        <div class="selection-controls">
+            <button id="select-all-btn" onclick="selectAll()">すべて選択</button>
+            <button id="deselect-all-btn" onclick="deselectAll()">すべて解除</button>
+            <button id="back-to-mode-btn" onclick="backToMode()">戻る</button>
+        </div>
+        <div class="question-list" id="question-list"></div>
+        <button id="start-quiz-btn" onclick="startQuizWithSelected()" disabled>
+            選択した問題で挑戦開始
+        </button>
+    </div>
+
+    <!-- クイズ画面 -->
+    <div id="question-screen">
+        <div class="header-area">
+            <h2 id="question-counter">問題 1 / 15</h2>
+            <div>
+                <div id="score-display">正解: 0</div>
+                <button id="top-btn" onclick="backToMode()" style="background-color: #ff6b6b; color: white; padding: 5px 10px; font-size: 0.8em; margin-top: 5px; width: 100%; border: none; border-radius: 3px; cursor: pointer;">⏸ トップに戻る</button>
+            </div>
+        </div>
+        
+        <div id="last-result-display"></div>
+        <div id="question-text">以下のプログラムを実行したとき、画面に表示される値は何ですか？</div>
+        <pre><code id="code-block"></code></pre>
+        
+        <div id="choices-container"></div>
+        
+        <button id="next-btn" class="btn" onclick="goToNext()">次の問題へ ＞</button>
+    </div>
+
+    <!-- 終了画面 -->
+    <div id="end-screen">
+        <h2>お疲れ様でした！</h2>
+        <p>予定されていた問題がすべて終了しました。</p>
+        <div id="final-score" class="final-score-text"></div>
+        <button id="restart-btn" class="btn" onclick="backToMode()">モード選択に戻る</button>
+    </div>
+</div>
+
+<script>
+    // 15問分のデータ
+    const allQuestions = [
+        // 【問1】if-elif-elseの判定ルール（上から順に判定）
+        { id: "1_1", code: `number = 15\nif number % 3 == 0:\n    print("A")\nelif number % 5 == 0:\n    print("B")\nelse:\n    print("C")`, choices: ["A", "B", "C", "A と B の両方が表示される"], answer: 0 },
+        { id: "1_2", code: `n = 20\nif n % 10 == 0:\n    print("X")\nelif n % 4 == 0:\n    print("Y")\nelse:\n    print("Z")`, choices: ["X", "Y", "Z", "X と Y の両方が表示される"], answer: 0 },
+        { id: "1_3", code: `score = 85\nif score >= 70:\n    print("Pass")\nelif score >= 80:\n    print("Good")\nelse:\n    print("Fail")`, choices: ["Good", "Fail", "Pass", "エラーになる"], answer: 2 },
+        { id: "1_4", code: `x = 12\nif x % 2 == 0:\n    print("Even")\nelif x % 3 == 0:\n    print("Fizz")\nelse:\n    print("None")`, choices: ["Fizz", "Even", "None", "Even と Fizz の両方が表示される"], answer: 1 },
+        { id: "1_5", code: `age = 25\nif age >= 18:\n    print("Adult")\nelif age >= 20:\n    print("Can Drink")\nelse:\n    print("Minor")`, choices: ["Minor", "Can Drink", "エラーになる", "Adult"], answer: 3 },
+
+        // 【問2】大文字・小文字の区別（ひっかけ）
+        { id: "2_1", code: `user_name = "Yamada"\nif user_name == "yamada":\n    print("ようこそ")\nelse:\n    print("だれですか？")`, choices: ["ようこそ", "だれですか？", "Yamada", "エラーになる"], answer: 1 },
+        { id: "2_2", code: `pwd = "Pass123"\nif pwd == "pass123":\n    print("OK")\nelse:\n    print("NG")`, choices: ["OK", "NG", "Pass123", "エラーになる"], answer: 1 },
+        { id: "2_3", code: `color = "Red"\nif color == "RED":\n    print("1")\nelse:\n    print("2")`, choices: ["1", "Red", "2", "エラーになる"], answer: 2 },
+        { id: "2_4", code: `code = "A100"\nif code == "a100":\n    print("Match")\nelse:\n    print("Mismatch")`, choices: ["Match", "Mismatch", "A100", "エラーになる"], answer: 1 },
+        { id: "2_5", code: `word = "Python"\nif word == "python":\n    print("Yes")\nelse:\n    print("No")`, choices: ["エラーになる", "Yes", "No", "Python"], answer: 2 },
+
+        // 【問3】range(回数) の繰り返し回数
+        { id: "3_1", code: `count = 0\nfor i in range(4):\n    count += 1\nprint(count)`, choices: ["0", "3", "4", "5"], answer: 2 },
+        { id: "3_2", code: `c = 0\nfor i in range(5):\n    c += 2\nprint(c)`, choices: ["10", "2", "5", "7"], answer: 0 },
+        { id: "3_3", code: `n = 0\nfor i in range(3):\n    n += 10\nprint(n)`, choices: ["10", "13", "30", "3"], answer: 2 },
+        { id: "3_4", code: `total = 0\nfor x in range(2):\n    total += 5\nprint(total)`, choices: ["2", "5", "10", "7"], answer: 2 },
+        { id: "3_5", code: `ans = 0\nfor k in range(6):\n    ans += 1\nprint(ans)`, choices: ["1", "5", "7", "6"], answer: 3 },
+
+        // 【問4】合計（累積）のバッドパターン
+        { id: "4_1", code: `numbers = [1, 2, 3]\nfor num in numbers:\n    total = 0\n    total += num\nprint(total)`, choices: ["6", "3", "0", "エラーになる"], answer: 1 },
+        { id: "4_2", code: `prices = [100, 200]\nfor p in prices:\n    sum_val = 0\n    sum_val += p\nprint(sum_val)`, choices: ["100", "300", "200", "エラーになる"], answer: 2 },
+        { id: "4_3", code: `points = [5, 10, 15]\nfor pt in points:\n    score = 0\n    score += pt\nprint(score)`, choices: ["15", "30", "5", "エラーになる"], answer: 0 },
+        { id: "4_4", code: `data = [1, 1, 1, 1]\nfor d in data:\n    count = 0\n    count += d\nprint(count)`, choices: ["4", "1", "0", "エラーになる"], answer: 1 },
+        { id: "4_5", code: `vals = [10, 20, 30]\nfor v in vals:\n    ans = 0\n    ans += v\nprint(ans)`, choices: ["60", "0", "エラーになる", "30"], answer: 3 },
+
+        // 【問5】break文によるループ強制脱出
+        { id: "5_1", code: `i = 0\nwhile True:\n    i += 1\n    if i == 3:\n        break\n    print(i, end="")`, choices: ["123", "12", "3", "1234...と無限に表示される"], answer: 1 },
+        { id: "5_2", code: `x = 0\nwhile True:\n    x += 1\n    if x == 4:\n        break\n    print(x, end="")`, choices: ["123", "1234", "4", "無限ループになる"], answer: 0 },
+        { id: "5_3", code: `for k in range(1, 10):\n    if k == 3:\n        break\n    print(k, end="")`, choices: ["123", "12", "3", "エラーになる"], answer: 1 },
+        { id: "5_4", code: `num = 5\nwhile num > 0:\n    if num == 3:\n        break\n    print(num, end="")\n    num -= 1`, choices: ["54", "543", "3", "無限ループになる"], answer: 0 },
+        { id: "5_5", code: `for i in [10, 20, 30, 40]:\n    if i == 30:\n        break\n    print(i, end="")`, choices: ["102030", "1020", "30", "エラーになる"], answer: 1 },
+
+        // 【問6】continue文による処理のスキップ
+        { id: "6_1", code: `for x in range(1, 5):\n    if x == 3:\n        continue\n    print(x, end="")`, choices: ["1234", "124", "12", "3"], answer: 1 },
+        { id: "6_2", code: `for i in range(1, 4):\n    if i == 2:\n        continue\n    print(i, end="")`, choices: ["12", "13", "2", "エラーになる"], answer: 1 },
+        { id: "6_3", code: `for n in [10, 20, 30]:\n    if n == 20:\n        continue\n    print(n, end="")`, choices: ["1030", "1020", "20", "エラーになる"], answer: 0 },
+        { id: "6_4", code: `for c in "ABC":\n    if c == "B":\n        continue\n    print(c, end="")`, choices: ["AB", "B", "AC", "ABC"], answer: 2 },
+        { id: "6_5", code: `for k in range(4):\n    if k % 2 == 0:\n        continue\n    print(k, end="")`, choices: ["02", "13", "0123", "エラーになる"], answer: 1 },
+
+        // 【問7】return（戻り値）による計算結果の回収
+        { id: "7_1", code: `def double(x):\n    return x * 2\n\nresult = double(5)\nprint(result)`, choices: ["5", "10", "x * 2", "何も表示されない"], answer: 1 },
+        { id: "7_2", code: `def add_five(n):\n    return n + 5\n\nans = add_five(10)\nprint(ans)`, choices: ["5", "15", "n + 5", "何も表示されない"], answer: 1 },
+        { id: "7_3", code: `def get_first(lst):\n    return lst[0]\n\nval = get_first([9, 8, 7])\nprint(val)`, choices: ["7", "lst[0]", "9", "エラーになる"], answer: 2 },
+        { id: "7_4", code: `def is_even(x):\n    return x % 2 == 0\n\nprint(is_even(4))`, choices: ["True", "False", "4", "何も表示されない"], answer: 0 },
+        { id: "7_5", code: `def make_greet(name):\n    return name + "さん"\n\nmsg = make_greet("田中")\nprint(msg)`, choices: ["nameさん", "田中さん", "エラーになる", "何も表示されない"], answer: 1 },
+
+        // 【問8】print と return の違い（Noneの壁）
+        { id: "8_1", code: `def add(a, b):\n    print(a + b)\n\nanswer = add(2, 3)\nprint(answer)`, choices: ["5", "5 が2行（5 と 5）表示される", "5 と None が表示される", "エラーになる"], answer: 2 },
+        { id: "8_2", code: `def show_calc(x):\n    print(x * 2)\n\nres = show_calc(10)\nprint(res)`, choices: ["20 と None が表示される", "20", "20 が2行表示される", "エラーになる"], answer: 0 },
+        { id: "8_3", code: `def greet():\n    print("Hello")\n\nret = greet()\nprint(ret)`, choices: ["Hello", "エラーになる", "Hello と None が表示される", "None"], answer: 2 },
+        { id: "8_4", code: `def display(msg):\n    print(msg)\n\nval = display("Test")\nprint(val)`, choices: ["Test が2行表示される", "Test と None が表示される", "Test", "エラーになる"], answer: 1 },
+        { id: "8_5", code: `def sub(a, b):\n    print(a - b)\n\nans = sub(10, 3)\nprint(ans)`, choices: ["7", "7 と None が表示される", "7 が2行表示される", "エラーになる"], answer: 1 },
+
+        // 【問9】変数の有効範囲（スコープ）
+        { id: "9_1", code: `message = "廊下"\n\ndef change_msg():\n    message = "教室"\n\nchange_msg()\nprint(message)`, choices: ["廊下", "教室", "廊下教室", "エラーになる"], answer: 0 },
+        { id: "9_2", code: `x = 10\n\ndef update():\n    x = 99\n\nupdate()\nprint(x)`, choices: ["10", "99", "1099", "エラーになる"], answer: 0 },
+        { id: "9_3", code: `name = "A"\n\ndef set_name():\n    name = "B"\n\nset_name()\nprint(name)`, choices: ["A", "B", "AB", "エラーになる"], answer: 0 },
+        { id: "9_4", code: `count = 0\n\ndef count_up():\n    count = 1\n\ncount_up()\nprint(count)`, choices: ["1", "0", "01", "エラーになる"], answer: 1 },
+        { id: "9_5", code: `status = "Off"\n\ndef turn_on():\n    status = "On"\n\nturn_on()\nprint(status)`, choices: ["On", "Off", "OffOn", "エラーになる"], answer: 1 },
+
+        // 【問10】デフォルト引数（初期値）の動作
+        { id: "10_1", code: `def make_juice(flavor="アップル"):\n    print(f"{flavor}ジュース")\n\nmake_juice("オレンジ")\nmake_juice()`, choices: ["オレンジジュース が2行表示される", "アップルジュース が2行表示される", "オレンジジュース と アップルジュース が表示される", "引数が足りないのでエラーになる"], answer: 2 },
+        { id: "10_2", code: `def greet(name="ゲスト"):\n    print(name)\n\ngreet("太郎")\ngreet()`, choices: ["太郎 が2行表示される", "ゲスト が2行表示される", "太郎 と ゲスト が表示される", "エラーになる"], answer: 2 },
+        { id: "10_3", code: `def set_mode(mode="Normal"):\n    print(mode)\n\nset_mode("Hard")\nset_mode()`, choices: ["Hard と Normal が表示される", "Hard が2行表示される", "Normal が2行表示される", "エラーになる"], answer: 0 },
+        { id: "10_4", code: `def show_price(p=100):\n    print(p)\n\nshow_price(500)\nshow_price()`, choices: ["500", "500 と 100 が表示される", "100", "エラーになる"], answer: 1 },
+        { id: "10_5", code: `def draw(color="黒"):\n    print(color)\n\ndraw("赤")\ndraw()`, choices: ["黒 と 赤 が表示される", "赤 と 黒 が表示される", "赤 が2行表示される", "エラーになる"], answer: 1 }
+    ];
+
+    const QUESTIONS_PER_PLAY = 15;
+    let currentQuizList = [];
+    let currentQuestionIndex = 0;
+    let currentScore = 0;
+    let selectedQuestionIds = new Set();
+    
+    // ========================
+    // 正誤履歴管理
+    // ========================
+    
+    function saveQuestionResult(questionId, isCorrect) {
+        const history = getHistoryData();
+        history[questionId] = {
+            correct: isCorrect,
+            timestamp: new Date().getTime()
+        };
+        localStorage.setItem('quizHistory', JSON.stringify(history));
+    }
+    
+    function getHistoryData() {
+        const data = localStorage.getItem('quizHistory');
+        return data ? JSON.parse(data) : {};
+    }
+    
+    function getQuestionResult(questionId) {
+        const history = getHistoryData();
+        return history[questionId] || null;
+    }
+    
+    function getResultBadge(questionId) {
+        const result = getQuestionResult(questionId);
+        if (!result) return '';
+        const text = result.correct ? '○' : '×';
+        const className = result.correct ? 'result-correct' : 'result-incorrect';
+        return `<span class="question-result-badge ${className}">${text}</span>`;
+    }
+    
+    function clearHistory() {
+        if (confirm('正誤履歴をすべてクリアしますか？')) {
+            localStorage.removeItem('quizHistory');
+            alert('履歴がクリアされました');
+            backToMode();
+        }
+    }
+
+    // ========================
+    // モード選択関数
+    // ========================
+
+    function selectRandomMode() {
+        document.getElementById('mode-selection-screen').style.display = 'none';
+        document.getElementById('random-selection-screen').style.display = 'block';
+        document.getElementById('random-question-count').focus();
+    }
+
+    function selectChoiceMode() {
+        showQuestionSelection();
+    }
+
+    function backToMode() {
+        document.getElementById('question-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'none';
+        document.getElementById('question-selection-screen').style.display = 'none';
+        document.getElementById('random-selection-screen').style.display = 'none';
+        document.getElementById('mode-selection-screen').style.display = 'block';
+        selectedQuestionIds.clear();
+        updateSelectedCount();
+    }
+
+    // ========================
+    // 問題選択画面の処理
+    // ========================
+
+    function showQuestionSelection() {
+        document.getElementById('mode-selection-screen').style.display = 'none';
+        document.getElementById('random-selection-screen').style.display = 'none';
+        document.getElementById('question-selection-screen').style.display = 'block';
+        
+        const questionList = document.getElementById('question-list');
+        questionList.innerHTML = '';
+        
+        allQuestions.forEach((q) => {
+            const label = document.createElement('label');
+            label.className = 'question-checkbox';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = q.id;
+            checkbox.onchange = (e) => {
+                if (e.target.checked) {
+                    selectedQuestionIds.add(q.id);
+                } else {
+                    selectedQuestionIds.delete(q.id);
+                }
+                updateSelectedCount();
+            };
+            
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(q.id));
+            
+            // 正誤結果バッジを追加
+            const badge = getResultBadge(q.id);
+            if (badge) {
+                const badgeSpan = document.createElement('span');
+                badgeSpan.innerHTML = badge;
+                label.appendChild(badgeSpan);
+            }
+            
+            questionList.appendChild(label);
+        });
+    }
+
+    function updateSelectedCount() {
+        document.getElementById('selected-count').textContent = selectedQuestionIds.size;
+        document.getElementById('start-quiz-btn').disabled = selectedQuestionIds.size === 0;
+    }
+
+    function selectAll() {
+        const checkboxes = document.querySelectorAll('#question-list input[type="checkbox"]');
+        checkboxes.forEach((cb) => {
+            cb.checked = true;
+            selectedQuestionIds.add(cb.value);
+        });
+        updateSelectedCount();
+    }
+
+    function deselectAll() {
+        const checkboxes = document.querySelectorAll('#question-list input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.checked = false;
+        });
+        selectedQuestionIds.clear();
+        updateSelectedCount();
+    }
+
+    // ========================
+    // クイズ実行処理
+    // ========================
+
+    function startQuizRandom() {
+        const countInput = document.getElementById('random-question-count').value;
+        const count = Math.max(1, Math.min(parseInt(countInput) || 15, allQuestions.length));
+        currentQuizList = shuffleArray(allQuestions).slice(0, count);
+        startQuizCore();
+    }
+
+    function startQuizWithSelected() {
+        const selectedQuestions = allQuestions.filter(q => selectedQuestionIds.has(q.id));
+        currentQuizList = shuffleArray(selectedQuestions);
+        startQuizCore();
+    }
+    
+    function getQuestionCount() {
+        return currentQuizList.length;
+    }
+
+    function startQuizCore() {
+        currentQuestionIndex = 0;
+        currentScore = 0;
+        
+        document.getElementById('mode-selection-screen').style.display = 'none';
+        document.getElementById('question-selection-screen').style.display = 'none';
+        document.getElementById('random-selection-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'none';
+        document.getElementById('question-screen').style.display = 'block';
+        
+        showQuestion();
+    }
+
+    function shuffleArray(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function showQuestion() {
+        const q = currentQuizList[currentQuestionIndex];
+        const totalQuestions = getQuestionCount();
+        
+        document.getElementById('question-counter').textContent = `問題 ${currentQuestionIndex + 1} / ${totalQuestions} 　[問題ID: ${q.id}]`;
+        
+        // 直近の正誤結果を表示
+        const resultDisplay = document.getElementById('last-result-display');
+        const lastResult = getQuestionResult(q.id);
+        if (lastResult) {
+            const resultText = lastResult.correct ? '✓ 前回は正解' : '✗ 前回は不正解';
+            const resultClass = lastResult.correct ? 'correct' : 'incorrect';
+            resultDisplay.innerHTML = `<strong>直近の結果:</strong> <span style="color: ${lastResult.correct ? '#4CAF50' : '#F44336'}">${resultText}</span>`;
+            resultDisplay.classList.add('show');
+        } else {
+            resultDisplay.classList.remove('show');
+        }
+        document.getElementById('score-display').textContent = `正解: ${currentScore}`;
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('code-block').textContent = q.code;
+        
+        const choicesContainer = document.getElementById('choices-container');
+        choicesContainer.innerHTML = '';
+        
+        q.choices.forEach((choiceText, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn';
+            btn.textContent = choiceText;
+            btn.onclick = () => checkAnswer(index, q.answer, btn);
+            choicesContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedIndex, correctIndex, clickedBtn) {
+        const buttons = document.querySelectorAll('#choices-container .btn');
+        buttons.forEach(btn => btn.disabled = true);
+        
+        const q = currentQuizList[currentQuestionIndex];
+        const isCorrect = selectedIndex === correctIndex;
+        
+        // 正誤結果を保存
+        saveQuestionResult(q.id, isCorrect);
+        
+        if (isCorrect) {
+            clickedBtn.classList.add('correct');
+            currentScore++;
+            document.getElementById('score-display').textContent = `正解: ${currentScore}`;
+        } else {
+            clickedBtn.classList.add('incorrect');
+            buttons[correctIndex].classList.add('correct');
+        }
+
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function goToNext() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < currentQuizList.length) {
+            showQuestion();
+        } else {
+            showEndScreen();
+        }
+    }
+
+    function showEndScreen() {
+        const totalQuestions = getQuestionCount();
+        document.getElementById('question-screen').style.display = 'none';
+        document.getElementById('random-selection-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+        document.getElementById('final-score').textContent = 
+            `${totalQuestions}問中 ${currentScore}問正解 でした！`;
+    }
+
+    window.onload = () => {
+        document.getElementById('mode-selection-screen').style.display = 'block';
+    };
+</script>
+
+</body>
+</html>
