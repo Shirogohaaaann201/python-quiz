@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PythonⅡ 中間試験 対策練習アプリ</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+            --code-text: #f1f5f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 680px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin: 8px 0 30px;
+        }
+
+        /* 共通ヘッダー */
+        .app-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .app-header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .app-header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .screen {
+            padding: 20px;
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* モード選択画面 */
+        .category-select-group {
+            margin-bottom: 20px;
+        }
+
+        .group-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .category-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .category-tab {
+            padding: 10px 8px;
+            text-align: center;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            transition: all 0.2s;
+        }
+
+        .category-tab.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .stats-card {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stats-item .val {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stats-item .lbl {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-top: 2px;
+        }
+
+        .mode-card {
+            background: white;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .mode-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .mode-icon {
+            font-size: 1.8rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .mode-info h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 3px;
+        }
+
+        .mode-info p {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+
+        .danger-zone {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+            text-align: center;
+        }
+
+        .btn-text-danger {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        .btn-text-danger:hover {
+            background: var(--danger-light);
+        }
+
+        /* 問題設定画面 */
+        .config-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        .config-box label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .count-picker {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .count-btn {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .count-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 問題選択リスト画面 */
+        .selection-toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+        }
+        .btn-sm:hover {
+            background: #f1f5f9;
+        }
+
+        .theme-accordion {
+            max-height: 440px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px;
+            margin-bottom: 16px;
+            background: #fafafa;
+        }
+
+        .theme-group {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .theme-header {
+            padding: 10px 12px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .theme-questions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+            gap: 6px;
+            padding: 10px;
+        }
+
+        .question-chip {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 4px;
+            font-size: 0.78rem;
+            text-align: center;
+            cursor: pointer;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            transition: all 0.15s;
+        }
+
+        .question-chip.selected {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .chip-badge {
+            font-size: 0.7rem;
+            line-height: 1;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .chip-badge.correct { background: var(--success-light); color: var(--success); }
+        .chip-badge.incorrect { background: var(--danger-light); color: var(--danger); }
+
+        /* クイズ画面 */
+        .quiz-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .quiz-progress-text {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .quiz-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: #e2e8f0;
+            color: #334155;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        .btn-quit {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .question-instruction {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            line-height: 1.45;
+        }
+
+        /* コードブロック */
+        .code-container {
+            position: relative;
+            background: var(--code-bg);
+            border-radius: 10px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .code-header-bar {
+            background: #0f172a;
+            padding: 6px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-family: monospace;
+        }
+
+        pre.code-view {
+            padding: 14px;
+            margin: 0;
+            overflow-x: auto;
+            color: var(--code-text);
+            font-family: "Consolas", "Monaco", "Courier New", monospace;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            white-space: pre;
+        }
+
+        /* 穴埋め用のハイライト空欄 */
+        .blank-highlight {
+            background-color: #fbbf24;
+            color: #0f172a;
+            font-weight: 900;
+            padding: 1px 6px;
+            border-radius: 4px;
+            border: 1px dashed #b45309;
+            box-shadow: 0 0 6px rgba(251, 191, 36, 0.6);
+        }
+
+        /* 選択肢 */
+        .choices-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .choice-btn {
+            background: white;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 13px 16px;
+            text-align: left;
+            font-size: 0.92rem;
+            font-family: inherit;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.4;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .choice-btn:disabled {
+            cursor: default;
+        }
+
+        .choice-btn.correct {
+            border-color: var(--success);
+            background: var(--success-light);
+            color: #14532d;
+            font-weight: 700;
+        }
+
+        .choice-btn.incorrect {
+            border-color: var(--danger);
+            background: var(--danger-light);
+            color: #7f1d1d;
+        }
+
+        .choice-key {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            width: 20px;
+            flex-shrink: 0;
+        }
+
+        .choice-text {
+            flex-grow: 1;
+            word-break: break-all;
+            font-family: "Consolas", monospace, sans-serif;
+        }
+
+        /* 解説エリア */
+        .explanation-card {
+            background: #f8fafc;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 16px;
+            display: none;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .explanation-card.show {
+            display: block;
+        }
+
+        .explanation-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .explanation-text {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text-sub);
+        }
+
+        /* ボタン */
+        .btn-action {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.15s;
+            text-align: center;
+        }
+        .btn-action:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+        .btn-action:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text-main);
+            margin-top: 8px;
+        }
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        /* 終了画面 */
+        .result-container {
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .result-emoji {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+
+        .result-score {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .result-msg {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .result-summary-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        /* レスポンシブ調整（スマホ向け） */
+        @media (max-width: 480px) {
+            body {
+                padding: 6px;
+            }
+            #app-container {
+                margin: 0;
+                border-radius: 12px;
+            }
+            .screen {
+                padding: 14px;
+            }
+            .app-header {
+                padding: 16px 12px;
+            }
+            .app-header h1 {
+                font-size: 1.15rem;
+            }
+            pre.code-view {
+                font-size: 0.85rem;
+                padding: 10px;
+            }
+            .choice-btn {
+                padding: 11px 12px;
+                font-size: 0.88rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div class="app-header">
+        <h1>🐍 PythonⅡ 中間試験 対策練習アプリ</h1>
+        <p>第1コマ（ミニコード読解）＆ 第2コマ（RPG穴埋め）特訓</p>
+    </div>
+
+    <!-- 1. トップ（モード選択画面） -->
+    <div id="screen-home" class="screen active">
+        <!-- PythonⅠへの導線リンクバナー -->
+        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:10px 14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:0.85rem; color:#0369a1; font-weight:600;">
+                📘 PythonⅠ（前回）の練習問題はこちら
+            </div>
+            <a href="python1.html" style="background:#0284c7; color:white; text-decoration:none; padding:5px 12px; border-radius:6px; font-size:0.8rem; font-weight:700; display:inline-block;">PythonⅠを開く ↗</a>
+        </div>
+
+        <!-- カテゴリ選択タブ -->
+        <div class="category-select-group">
+            <div class="group-title">🎯 練習する対象を選択</div>
+            <div class="category-tabs">
+                <button class="category-tab active" onclick="setCategory('all')">全問ミックス<br><span style="font-size:0.75rem;font-weight:normal;">(ミニ+穴埋め)</span></button>
+                <button class="category-tab" onclick="setCategory('mini')">ミニコード読解<br><span style="font-size:0.75rem;font-weight:normal;">(全13テーマ)</span></button>
+                <button class="category-tab" onclick="setCategory('fill')">RPG穴埋め<br><span style="font-size:0.75rem;font-weight:normal;">(全10空欄)</span></button>
+            </div>
+        </div>
+
+        <!-- 学習履歴サマリー -->
+        <div class="stats-card">
+            <div class="stats-item">
+                <div class="val" id="stat-total-count">0</div>
+                <div class="lbl">収録問題数</div>
+            </div>
+            <div class="stats-item">
+                <div class="val" id="stat-solved-count">0</div>
+                <div class="lbl">解答済み</div>
+            </div>
+            <div class="stats-item">
+                <div class="val" id="stat-correct-rate">0%</div>
+                <div class="lbl">正答率</div>
+            </div>
+        </div>
+
+        <!-- モード選択カード -->
+        <div class="group-title">🎮 プレイモードを選択</div>
+        
+        <button class="mode-card" onclick="openRandomConfig()">
+            <div class="mode-icon">🎲</div>
+            <div class="mode-info">
+                <h3>ランダムテスト</h3>
+                <p>選択中のカテゴリから指定した問題数をランダムに出題します</p>
+            </div>
+        </button>
+
+        <button class="mode-card" onclick="openThemeSelect()">
+            <div class="mode-icon">📋</div>
+            <div class="mode-info">
+                <h3>問題選択モード</h3>
+                <p>苦手なテーマや設問を自分で選んで集中的に特訓できます</p>
+            </div>
+        </button>
+
+        <button class="mode-card" id="btn-weak-mode" onclick="startWeakMode()">
+            <div class="mode-icon">🔁</div>
+            <div class="mode-info">
+                <h3>苦手克服モード</h3>
+                <p id="weak-mode-desc">過去に間違えた問題（0問）を再復習します</p>
+            </div>
+        </button>
+
+        <div class="danger-zone">
+            <button class="btn-text-danger" onclick="clearAllHistory()">🗑️ 正誤履歴をリセットする</button>
+        </div>
+    </div>
+
+    <!-- 2. ランダム出題設定画面 -->
+    <div id="screen-random-config" class="screen">
+        <div class="group-title">🎲 ランダムテスト設定</div>
+        <div class="config-box">
+            <label>出題する問題数を選んでください</label>
+            <div class="count-picker">
+                <button class="count-btn" onclick="setQuestionCount(5)">5問</button>
+                <button class="count-btn active" onclick="setQuestionCount(10)">10問</button>
+                <button class="count-btn" onclick="setQuestionCount(15)">15問</button>
+                <button class="count-btn" onclick="setQuestionCount(20)">20問</button>
+                <button class="count-btn" onclick="setQuestionCount('all')">全問</button>
+            </div>
+            <p id="random-info-text" style="font-size:0.8rem; color:var(--text-sub); margin-top:8px;">現在選択中: 10問</p>
+        </div>
+
+        <button class="btn-action" onclick="startRandomQuiz()">この設定でスタート 🚀</button>
+        <button class="btn-action btn-secondary" onclick="goToScreen('screen-home')">戻る</button>
+    </div>
+
+    <!-- 3. 個別問題選択画面 -->
+    <div id="screen-theme-select" class="screen">
+        <div class="quiz-top-bar">
+            <div class="quiz-progress-text">問題選択（<span id="select-chip-count">0</span>問選択中）</div>
+        </div>
+
+        <div class="selection-toolbar">
+            <button class="btn-sm" onclick="selectAllQuestions()">すべて選択</button>
+            <button class="btn-sm" onclick="deselectAllQuestions()">すべて解除</button>
+            <button class="btn-sm" onclick="selectIncorrectOnly()">間違えた問題のみ</button>
+        </div>
+
+        <div class="theme-accordion" id="theme-accordion-list">
+            <!-- JSで動的生成 -->
+        </div>
+
+        <button class="btn-action" id="btn-start-selected" onclick="startSelectedQuiz()" disabled>選択した問題でスタート</button>
+        <button class="btn-action btn-secondary" onclick="goToScreen('screen-home')">トップに戻る</button>
+    </div>
+
+    <!-- 4. クイズ出題画面 -->
+    <div id="screen-quiz" class="screen">
+        <div class="quiz-top-bar">
+            <div>
+                <span class="quiz-progress-text" id="quiz-counter">Q 1 / 10</span>
+                <span class="quiz-tag" id="quiz-theme-tag" style="margin-left: 6px;">第1回</span>
+            </div>
+            <button class="btn-quit" onclick="confirmQuit()">中断</button>
+        </div>
+
+        <div class="question-instruction" id="question-instruction-text">
+            以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。
+        </div>
+
+        <div class="code-container">
+            <div class="code-header-bar">
+                <span>python</span>
+                <span id="code-status-badge">問1 類題</span>
+            </div>
+            <pre class="code-view"><code id="quiz-code-block"></code></pre>
+        </div>
+
+        <div class="choices-list" id="quiz-choices-container">
+            <!-- JSで動的生成 -->
+        </div>
+
+        <!-- 解答後の解説表示エリア -->
+        <div class="explanation-card" id="quiz-explanation-card">
+            <div class="explanation-title" id="explanation-title-text">💡 解説</div>
+            <div class="explanation-text" id="quiz-explanation-text"></div>
+        </div>
+
+        <button class="btn-action" id="btn-next-question" onclick="nextQuestion()" style="display: none;">次の問題へ ＞</button>
+    </div>
+
+    <!-- 5. 終了・結果画面 -->
+    <div id="screen-result" class="screen">
+        <div class="result-container">
+            <div class="result-emoji" id="result-emoji">🎉</div>
+            <h2 style="font-size:1.3rem; margin-bottom:8px;">演習完了！ お疲れ様でした</h2>
+            <div class="result-score" id="result-score-text">8 / 10</div>
+            <div class="result-msg" id="result-msg-text">素晴らしい仕上がりです！ 中間試験本番もバッチリです。</div>
+
+            <div class="result-summary-box">
+                <div class="stats-item">
+                    <div class="val" id="res-correct-count" style="color:var(--success);">0</div>
+                    <div class="lbl">正解</div>
+                </div>
+                <div class="stats-item">
+                    <div class="val" id="res-incorrect-count" style="color:var(--danger);">0</div>
+                    <div class="lbl">不正解</div>
+                </div>
+                <div class="stats-item">
+                    <div class="val" id="res-accuracy-rate">0%</div>
+                    <div class="lbl">正答率</div>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="retryCurrentQuiz()">同じ問題をもう一度解く 🔁</button>
+            <button class="btn-action btn-secondary" onclick="goToScreen('screen-home')">トップメニューに戻る</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // データベース定義（全問題マスター）
+    // ==========================================
+    // category: "mini" (ミニコード読解) または "fill" (RPG穴埋め)
+    // themeId: テーマ識別子 (M01〜M13, F01〜F10)
+    // id: 個別ID (例: M01_1)
+    
+    const quizDatabase = [
+        // ========================================================
+        // 【ミニコード読解】全13テーマ × 各4題 = 52問
+        // ========================================================
+
+        // M01: 【第1回】クラス定義とインスタンス属性の独立性
+        {
+            id: "M01_1", category: "mini", themeId: "M01", themeTitle: "第1回: インスタンス属性の変更",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Player:\n    def __init__(self, name):\n        self.hp = 100\n\np1 = Player("勇者")\np1.hp -= 30\np2 = Player("戦士")\nprint(p1.hp, p2.hp)`,
+            choices: ["70 100", "70 70", "100 100", "30 100"], answer: 0,
+            explanation: "インスタンスごとに独立した属性（self.hp）を持っています。p1.hpのみが30減算されて70となり、新しく生成されたp2.hpは初期値100のままです。"
+        },
+        {
+            id: "M01_2", category: "mini", themeId: "M01", themeTitle: "第1回: インスタンス属性の変更",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Hero:\n    def __init__(self, name):\n        self.mp = 50\n\nh1 = Hero("アリス")\nh1.mp -= 15\nh2 = Hero("ボブ")\nprint(h1.mp, h2.mp)`,
+            choices: ["35 50", "35 35", "50 50", "15 50"], answer: 0,
+            explanation: "h1のmpのみが15減算されて35となり、後から生成されたh2のmpは初期値の50のままとなります。"
+        },
+        {
+            id: "M01_3", category: "mini", themeId: "M01", themeTitle: "第1回: インスタンス属性の変更",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Account:\n    def __init__(self, owner):\n        self.balance = 1000\n\na1 = Account("太郎")\na1.balance += 500\na2 = Account("次郎")\nprint(a1.balance, a2.balance)`,
+            choices: ["1500 1000", "1500 1500", "1000 1000", "500 1000"], answer: 0,
+            explanation: "a1の残高 balance のみが500加算されて1500となり、a2の balance は初期値の1000のままです。"
+        },
+        {
+            id: "M01_4", category: "mini", themeId: "M01", themeTitle: "第1回: インスタンス属性の変更",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Monster:\n    def __init__(self, name):\n        self.attack = 20\n\nm1 = Monster("スライム")\nm1.attack *= 2\nm2 = Monster("ゴブリン")\nprint(m1.attack, m2.attack)`,
+            choices: ["40 20", "40 40", "20 20", "エラーになる"], answer: 0,
+            explanation: "m1の攻撃力のみが2倍（20 * 2 = 40）になり、新しく生成されたm2のattackは初期値20のままです。"
+        },
+
+        // M02: 【第1回】メソッド内での変数参照と self
+        {
+            id: "M02_1", category: "mini", themeId: "M02", themeTitle: "第1回: メソッドとselfの参照",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Player:\n    def __init__(self, name):\n        self.name = name\n\n    def hello(self):\n        # self.name ではなく name と参照\n        print(f"私は{name}です")\n\np = Player("勇者")\np.hello()`,
+            choices: ["エラーになる", "私は勇者です", "私はPlayerです", "私はです"], answer: 0,
+            explanation: "クラスのメソッド内でインスタンス変数を参照する際は、必ず self.name と書く必要があります。単に name と書くと未定義エラー（NameError）が発生します。"
+        },
+        {
+            id: "M02_2", category: "mini", themeId: "M02", themeTitle: "第1回: メソッドとselfの参照",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Character:\n    def __init__(self, hp):\n        self.hp = hp\n\n    def show_hp(self):\n        print(hp)\n\nc = Character(100)\nc.show_hp()`,
+            choices: ["エラーになる", "100", "None", "self.hp"], answer: 0,
+            explanation: "self.hp ではなく hp と参照しているため、ローカル変数やグローバル変数に hp が見つからず NameError となります。"
+        },
+        {
+            id: "M02_3", category: "mini", themeId: "M02", themeTitle: "第1回: メソッドとselfの参照",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class User:\n    def __init__(self, user_id):\n        self.user_id = user_id\n\n    def display(self):\n        print(f"ID: {user_id}")\n\nu = User("admin")\nu.display()`,
+            choices: ["エラーになる", "ID: admin", "ID: user_id", "ID: None"], answer: 0,
+            explanation: "メソッド内では self.user_id と指定しなければインスタンス属性にアクセスできず、未定義エラーとなります。"
+        },
+        {
+            id: "M02_4", category: "mini", themeId: "M02", themeTitle: "第1回: メソッドとselfの参照",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Mage:\n    def __init__(self, mp):\n        self.mp = mp\n\n    def check_mp(self):\n        print(f"MP:{self.mp}")\n\nm = Mage(50)\nm.check_mp()`,
+            choices: ["MP:50", "エラーになる", "MP:self.mp", "None"], answer: 0,
+            explanation: "今回は正しく self.mp と記述されているため、エラーにならず「MP:50」と正しく出力されます。"
+        },
+
+        // M03: 【第2回】クラスの継承とメソッドオーバーライド
+        {
+            id: "M03_1", category: "mini", themeId: "M03", themeTitle: "第2回: クラス継承とオーバーライド",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Character:\n    def attack(self):\n        return "通常攻撃！"\n\nclass Mage(Character):\n    def attack(self):\n        return "魔法攻撃！"\n\nplayer = Mage()\nprint(player.attack())`,
+            choices: ["魔法攻撃！", "通常攻撃！", "通常攻撃！ 魔法攻撃！", "None"], answer: 0,
+            explanation: "子クラス Mage が親クラス Character の attack メソッドをオーバーライド（上書き）しているため、子クラス側の「魔法攻撃！」が呼び出されます。"
+        },
+        {
+            id: "M03_2", category: "mini", themeId: "M03", themeTitle: "第2回: クラス継承とオーバーライド",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Animal:\n    def sound(self):\n        return "鳴き声"\n\nclass Dog(Animal):\n    def sound(self):\n        return "ワンワン！"\n\npet = Dog()\nprint(pet.sound())`,
+            choices: ["ワンワン！", "鳴き声", "鳴き声 ワンワン！", "エラーになる"], answer: 0,
+            explanation: "子クラス Dog でオーバーライドされた sound() が呼び出されるため、「ワンワン！」が出力されます。"
+        },
+        {
+            id: "M03_3", category: "mini", themeId: "M03", themeTitle: "第2回: クラス継承とオーバーライド",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Enemy:\n    def action(self):\n        return "通常こうげき"\n\nclass Boss(Enemy):\n    def action(self):\n        return "全体こうげき！"\n\ne = Boss()\nprint(e.action())`,
+            choices: ["全体こうげき！", "通常こうげき", "Boss", "None"], answer: 0,
+            explanation: "Bossクラスのインスタンスに対して action() を実行すると、上書きされた「全体こうげき！」が優先実行されます。"
+        },
+        {
+            id: "M03_4", category: "mini", themeId: "M03", themeTitle: "第2回: クラス継承とオーバーライド",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Vehicle:\n    def move(self):\n        return "移動する"\n\nclass Plane(Vehicle):\n    pass\n\np = Plane()\nprint(p.move())`,
+            choices: ["移動する", "空を飛ぶ", "エラーになる", "None"], answer: 0,
+            explanation: "子クラス Plane では move をオーバーライドしていない（pass）ため、親クラス Vehicle の move() メソッドがそのまま継承されて実行されます。"
+        },
+
+        // M04: 【第2回】isinstance による型判定
+        {
+            id: "M04_1", category: "mini", themeId: "M04", themeTitle: "第2回: isinstanceによる型判定",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Monster:\n    pass\n\nclass BossMonster(Monster):\n    pass\n\nboss = BossMonster()\nprint(isinstance(boss, BossMonster), isinstance(boss, Monster))`,
+            choices: ["True True", "True False", "False True", "False False"], answer: 0,
+            explanation: "isinstance(obj, クラス) は、そのオブジェクトが指定クラスまたはその親クラスのインスタンスである場合に True を返します。継承関係にあるため両方 True となります。"
+        },
+        {
+            id: "M04_2", category: "mini", themeId: "M04", themeTitle: "第2回: isinstanceによる型判定",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Bird:\n    pass\n\nclass Penguin(Bird):\n    pass\n\np = Penguin()\nprint(isinstance(p, Penguin), isinstance(p, Bird))`,
+            choices: ["True True", "True False", "False True", "エラーになる"], answer: 0,
+            explanation: "Penguin は Bird を継承しているため、どちらの判定に対しても True となります。"
+        },
+        {
+            id: "M04_3", category: "mini", themeId: "M04", themeTitle: "第2回: isinstanceによる型判定",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class User:\n    pass\n\nclass Admin(User):\n    pass\n\nu = User()\nprint(isinstance(u, Admin), isinstance(u, User))`,
+            choices: ["False True", "True True", "True False", "False False"], answer: 0,
+            explanation: "親クラス User のインスタンス u は、子クラス Admin のインスタンスではないため isinstance(u, Admin) は False、isinstance(u, User) は True となります。"
+        },
+        {
+            id: "M04_4", category: "mini", themeId: "M04", themeTitle: "第2回: isinstanceによる型判定",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `class Item:\n    pass\n\nclass Potion(Item):\n    pass\n\npt = Potion()\nprint(isinstance(pt, Item))`,
+            choices: ["True", "False", "Potion", "エラーになる"], answer: 0,
+            explanation: "Potion は Item を継承したクラスのインスタンスであるため、isinstance(pt, Item) は True です。"
+        },
+
+        // M05: 【第3回】例外処理の基本（try-except）
+        {
+            id: "M05_1", category: "mini", themeId: "M05", themeTitle: "第3回: 例外処理の基本",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `def check_level(lv):\n    try:\n        val = int(lv)\n        return val * 10\n    except ValueError:\n        return 0\n\nprint(check_level("99"), check_level("abc"))`,
+            choices: ["990 0", "990 エラーになる", "0 0", "990 None"], answer: 0,
+            explanation: '"99" は数値変換できて 99 * 10 = 990 が返ります。"abc" は int() で ValueError が発生しますが except で捕捉されて 0 が返ります。'
+        },
+        {
+            id: "M05_2", category: "mini", themeId: "M05", themeTitle: "第3回: 例外処理の基本",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `def calc_price(val):\n    try:\n        num = int(val)\n        return num + 100\n    except ValueError:\n        return -1\n\nprint(calc_price("50"), calc_price("xyz"))`,
+            choices: ["150 -1", "150 0", "150 エラーになる", "50 -1"], answer: 0,
+            explanation: '"50" は数値に変換されて 50 + 100 = 150 となり、"xyz" は変換失敗で except 節に入り -1 が返されます。'
+        },
+        {
+            id: "M05_3", category: "mini", themeId: "M05", themeTitle: "第3回: 例外処理の基本",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `def divide(a, b):\n    try:\n        return a // b\n    except ZeroDivisionError:\n        return 999\n\nprint(divide(10, 2), divide(10, 0))`,
+            choices: ["5 999", "5 エラーになる", "5 0", "999 999"], answer: 0,
+            explanation: "10 // 2 は 5 となり、10 // 0 は ZeroDivisionError が発生して except で捕捉され 999 が返ります。"
+        },
+        {
+            id: "M05_4", category: "mini", themeId: "M05", themeTitle: "第3回: 例外処理の基本",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `def safe_get(lst, idx):\n    try:\n        return lst[idx]\n    except IndexError:\n        return "なし"\n\nprint(safe_get(["A", "B"], 1), safe_get(["A", "B"], 5))`,
+            choices: ["B なし", "A なし", "B エラーになる", "なし なし"], answer: 0,
+            explanation: 'インデックス1は "B" です。インデックス5は存在せず IndexError が発生するため、except が働いて "なし" が返ります。'
+        },
+
+        // M06: 【第3回】例外処理の実行順序（try-except-finally）
+        {
+            id: "M06_1", category: "mini", themeId: "M06", themeTitle: "第3回: try-except-finallyの実行順序",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `result = []\ntry:\n    result.append("A")\n    x = 10 / 0\n    result.append("B")\nexcept ZeroDivisionError:\n    result.append("C")\nfinally:\n    result.append("D")\n\nprint("".join(result))`,
+            choices: ["ACD", "ABCD", "CD", "AC"], answer: 0,
+            explanation: '"A" が追加された後 10 / 0 で例外発生のため "B" はスキップ。except で "C" が追加され、最後に必ず動く finally で "D" が追加されるため "ACD" となります。'
+        },
+        {
+            id: "M06_2", category: "mini", themeId: "M06", themeTitle: "第3回: try-except-finallyの実行順序",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `res = []\ntry:\n    res.append("1")\n    v = int("error")\n    res.append("2")\nexcept ValueError:\n    res.append("3")\nfinally:\n    res.append("4")\n\nprint("".join(res))`,
+            choices: ["134", "1234", "34", "13"], answer: 0,
+            explanation: '"1" の後、int("error") で ValueError が発生し "2" はスキップ。except の "3" と finally の "4" が実行されて "134" になります。'
+        },
+        {
+            id: "M06_3", category: "mini", themeId: "M06", themeTitle: "第3回: try-except-finallyの実行順序",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `log = []\ntry:\n    log.append("開始")\n    x = 10 + 20\n    log.append("成功")\nexcept Exception:\n    log.append("失敗")\nfinally:\n    log.append("終了")\n\nprint("-".join(log))`,
+            choices: ["開始-成功-終了", "開始-失敗-終了", "開始-成功", "終了"], answer: 0,
+            explanation: "例外が発生しないため try 内が最後まで実行され（開始、成功）、except はスキップされ、最後に finally（終了）が実行されます。"
+        },
+        {
+            id: "M06_4", category: "mini", themeId: "M06", themeTitle: "第3回: try-except-finallyの実行順序",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `step = []\ntry:\n    step.append("X")\n    step.append("Y")\nfinally:\n    step.append("Z")\n\nprint("".join(step))`,
+            choices: ["XYZ", "XY", "Z", "エラーになる"], answer: 0,
+            explanation: "except 節がなくても try-finally は使用可能です。try ブロックの XY の後に finally の Z が実行され XYZ となります。"
+        },
+
+        // M07: 【第4回】リスト内包表記の基本計算
+        {
+            id: "M07_1", category: "mini", themeId: "M07", themeTitle: "第4回: リスト内包表記の基本",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `numbers = [1, 2, 3, 4]\ndoubled = [n * 2 for n in numbers]\nprint(doubled)`,
+            choices: ["[2, 4, 6, 8]", "[1, 2, 3, 4, 1, 2, 3, 4]", "[1, 2, 3, 4]", "[2, 4]"], answer: 0,
+            explanation: "リスト内包表記 [式 for 変数 in リスト] により、各要素が2倍された [2, 4, 6, 8] が生成されます。"
+        },
+        {
+            id: "M07_2", category: "mini", themeId: "M07", themeTitle: "第4回: リスト内包表記の基本",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `nums = [1, 2, 3]\nresult = [x + 10 for x in nums]\nprint(result)`,
+            choices: ["[11, 12, 13]", "[10, 20, 30]", "[1, 2, 3, 10]", "エラーになる"], answer: 0,
+            explanation: "各要素に10が加算され、[1+10, 2+10, 3+10] = [11, 12, 13] となります。"
+        },
+        {
+            id: "M07_3", category: "mini", themeId: "M07", themeTitle: "第4回: リスト内包表記の基本",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `data = [2, 3, 4]\npow_list = [n ** 2 for n in data]\nprint(pow_list)`,
+            choices: ["[4, 9, 16]", "[4, 6, 8]", "[2, 3, 4]", "[8, 27, 64]"], answer: 0,
+            explanation: "** 2 は2乗計算です。2の2乗=4、3の2乗=9、4の2乗=16 で [4, 9, 16] となります。"
+        },
+        {
+            id: "M07_4", category: "mini", themeId: "M07", themeTitle: "第4回: リスト内包表記の基本",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `words = [\"a\", \"b\", \"c\"]\nuppers = [w.upper() for w in words]\nprint(uppers)`,
+            choices: ["['A', 'B', 'C']", "['a', 'b', 'c']", "ABC", "エラーになる"], answer: 0,
+            explanation: "文字列メソッド .upper() により各文字が大文字に変換され、['A', 'B', 'C'] となります。"
+        },
+
+        // M08: 【第4回】リスト内包表記の条件分岐（ifフィルタ）
+        {
+            id: "M08_1", category: "mini", themeId: "M08", themeTitle: "第4回: リスト内包表記のifフィルタ",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `scores = [45, 80, 60, 95, 30]\nhigh_scores = [s for s in scores if s >= 70]\nprint(len(high_scores))`,
+            choices: ["2", "3", "[80, 95]", "5"], answer: 0,
+            explanation: "70以上のスコアは 80 と 95 の2つです。len(high_scores) で要素数を出力しているため 2 となります。"
+        },
+        {
+            id: "M08_2", category: "mini", themeId: "M08", themeTitle: "第4回: リスト内包表記のifフィルタ",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `ages = [15, 22, 18, 30, 12]\nadults = [a for a in ages if a >= 18]\nprint(len(adults))`,
+            choices: ["3", "2", "[22, 18, 30]", "5"], answer: 0,
+            explanation: "18以上の要素は 22, 18, 30 の3つです。要素数を数える len() なので 3 が出力されます。"
+        },
+        {
+            id: "M08_3", category: "mini", themeId: "M08", themeTitle: "第4回: リスト内包表記のifフィルタ",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `numbers = [1, 2, 3, 4, 5, 6]\nevens = [n for n in numbers if n % 2 == 0]\nprint(evens)`,
+            choices: ["[2, 4, 6]", "[1, 3, 5]", "3", "[0, 0, 0]"], answer: 0,
+            explanation: "n % 2 == 0（2で割り切れる偶数）を満たす [2, 4, 6] が抽出されてリストとして出力されます。"
+        },
+        {
+            id: "M08_4", category: "mini", themeId: "M08", themeTitle: "第4回: リスト内包表記のifフィルタ",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `words = [\"apple\", \"dog\", \"cat\", \"banana\"]\nlong_words = [w for w in words if len(w) >= 5]\nprint(len(long_words))`,
+            choices: ["2", "4", "['apple', 'banana']", "1"], answer: 0,
+            explanation: '文字数が5文字以上の単語は "apple"(5) と "banana"(6) の2件です。len() なので 2 が出力されます。'
+        },
+
+        // M09: 【第4回】三項演算子（1行 if-else）
+        {
+            id: "M09_1", category: "mini", themeId: "M09", themeTitle: "第4回: 三項演算子",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `hp = 0\nstatus = "戦闘不能" if hp <= 0 else "生存"\nprint(status)`,
+            choices: ["戦闘不能", "生存", "True", "False"], answer: 0,
+            explanation: '三項演算子の構文は「真のときの値 if 条件式 else 偽のときの値」です。hp <= 0 は真であるため、左側の "戦闘不能" が代入されます。'
+        },
+        {
+            id: "M09_2", category: "mini", themeId: "M09", themeTitle: "第4回: 三項演算子",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `score = 85\nresult = "合格" if score >= 70 else "不合格"\nprint(result)`,
+            choices: ["合格", "不合格", "True", "85"], answer: 0,
+            explanation: 'score >= 70 (85 >= 70) は True であるため、真のときの値である "合格" が出力されます。'
+        },
+        {
+            id: "M09_3", category: "mini", themeId: "M09", themeTitle: "第4回: 三項演算子",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `money = 500\nmsg = "買える" if money >= 1000 else "買えない"\nprint(msg)`,
+            choices: ["買えない", "買える", "500", "エラーになる"], answer: 0,
+            explanation: 'money >= 1000 (500 >= 1000) は False なので、else の後ろの "買えない" が代入されます。'
+        },
+        {
+            id: "M09_4", category: "mini", themeId: "M09", themeTitle: "第4回: 三項演算子",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `level = 10\nrank = "上級" if level >= 20 else "初級"\nprint(rank)`,
+            choices: ["初級", "上級", "10", "None"], answer: 0,
+            explanation: 'level >= 20 は成り立たない（False）ため、偽のときの値である "初級" が代入されます。'
+        },
+
+        // M10: 【第5回】モジュールの別名指定（as）
+        {
+            id: "M10_1", category: "mini", themeId: "M10", themeTitle: "第5回: import asによる別名指定",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `import math as m\n\nval = m.sqrt(16)\nprint(int(val))`,
+            choices: ["4", "4.0", "8", "エラーになる（m は未定義）"], answer: 0,
+            explanation: "import math as m で math モジュールを m という別名で使えます。sqrt(16) は 4.0 を返し、int() で整数化されて 4 となります。"
+        },
+        {
+            id: "M10_2", category: "mini", themeId: "M10", themeTitle: "第5回: import asによる別名指定",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `import math as m\n\nval = m.sqrt(25)\nprint(int(val))`,
+            choices: ["5", "5.0", "12.5", "エラーになる"], answer: 0,
+            explanation: "m.sqrt(25) で 25 の平方根 5.0 が計算され、int() でキャストされて 5 が出力されます。"
+        },
+        {
+            id: "M10_3", category: "mini", themeId: "M10", themeTitle: "第5回: import asによる別名指定",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `import math as m\n\nval = m.sqrt(9)\nprint(val)`,
+            choices: ["3.0", "3", "4.5", "エラーになる"], answer: 0,
+            explanation: "math.sqrt() は結果を浮動小数点数（float）として返すため、int() でキャストしない場合は 3.0 となります。"
+        },
+        {
+            id: "M10_4", category: "mini", themeId: "M10", themeTitle: "第5回: import asによる別名指定",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `import random as r\n\nnums = [10, 20, 30]\n# r は random モジュールの別名\nprint(len(nums))`,
+            choices: ["3", "10", "エラーになる", "ランダムな数値"], answer: 0,
+            explanation: "import random as r は別名インポートの正しい構文です。len(nums) は要素数の 3 を出力します。"
+        },
+
+        // M11: 【第5回】mathモジュールの代表的関数
+        {
+            id: "M11_1", category: "mini", themeId: "M11", themeTitle: "第5回: math関数の動作",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `from math import floor, ceil\n\nprint(floor(3.8), ceil(3.2))`,
+            choices: ["3 4", "4 3", "3.0 4.0", "4 4"], answer: 0,
+            explanation: "floor() は小数点以下の切り捨て（床関数）、ceil() は小数点以下の切り上げ（天井関数）を行うため、floor(3.8)は3、ceil(3.2)は4となります。"
+        },
+        {
+            id: "M11_2", category: "mini", themeId: "M11", themeTitle: "第5回: math関数の動作",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `from math import floor, ceil\n\nprint(floor(5.9), ceil(5.1))`,
+            choices: ["5 6", "6 5", "5 5", "6 6"], answer: 0,
+            explanation: "floor(5.9) は切り捨てで 5、ceil(5.1) は切り上げで 6 となります。"
+        },
+        {
+            id: "M11_3", category: "mini", themeId: "M11", themeTitle: "第5回: math関数の動作",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `from math import floor, ceil\n\nprint(floor(7.1), ceil(7.9))`,
+            choices: ["7 8", "8 7", "7 7", "8 8"], answer: 0,
+            explanation: "floor(7.1) は 7 に切り捨てられ、ceil(7.9) は 8 に切り上げられます。"
+        },
+        {
+            id: "M11_4", category: "mini", themeId: "M11", themeTitle: "第5回: math関数の動作",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `from math import floor\n\nval = floor(4.99)\nprint(val + 1)`,
+            choices: ["5", "4", "6", "5.99"], answer: 0,
+            explanation: "floor(4.99) は 4 です。4 + 1 の計算結果なので 5 が出力されます。"
+        },
+
+        // M12: 【第6回】ファイル操作の書き込みモード（mode="w"）
+        {
+            id: "M12_1", category: "mini", themeId: "M12", themeTitle: "第6回: ファイルの書き込みモード",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `# ファイル書き込みモードの動作\nwith open("test.txt", mode="w", encoding="utf-8") as f:\n    f.write("Hello")\n\nwith open("test.txt", mode="w", encoding="utf-8") as f:\n    f.write("World")\n\nwith open("test.txt", mode="r", encoding="utf-8") as f:\n    print(f.read())`,
+            choices: ["World", "HelloWorld", "Hello World", "Hello"], answer: 0,
+            explanation: 'mode="w"（上書き書き込みモード）は、同名のファイルが既に存在する場合、一度内容を空にしてから書き込みます。そのため2回目の "World" のみ残ります。'
+        },
+        {
+            id: "M12_2", category: "mini", themeId: "M12", themeTitle: "第6回: ファイルの書き込みモード",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `with open("log.txt", mode="w", encoding="utf-8") as f:\n    f.write("AAA")\n\nwith open("log.txt", mode="w", encoding="utf-8") as f:\n    f.write("BBB")\n\nwith open("log.txt", mode="r", encoding="utf-8") as f:\n    print(f.read())`,
+            choices: ["BBB", "AAABBB", "AAA", "エラーになる"], answer: 0,
+            explanation: 'mode="w" で再度オープンしているため "AAA" は上書き消去され、残る内容は "BBB" だけとなります。'
+        },
+        {
+            id: "M12_3", category: "mini", themeId: "M12", themeTitle: "第6回: ファイルの書き込みモード",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `with open("data.txt", mode="w", encoding="utf-8") as f:\n    f.write("リンゴ")\n\nwith open("data.txt", mode="w", encoding="utf-8") as f:\n    f.write("みかん")\n\nwith open("data.txt", mode="r", encoding="utf-8") as f:\n    print(f.read())`,
+            choices: ["みかん", "リンゴみかん", "リンゴ", "エラーになる"], answer: 0,
+            explanation: 'mode="w" の上書き動作により、2回目の "みかん" のみが出力されます（追記したい場合は mode="a" を使用します）。'
+        },
+        {
+            id: "M12_4", category: "mini", themeId: "M12", themeTitle: "第6回: ファイルの書き込みモード",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `with open("num.txt", mode="w", encoding="utf-8") as f:\n    f.write("100")\n\nwith open("num.txt", mode="w", encoding="utf-8") as f:\n    f.write("200")\n\nwith open("num.txt", mode="r", encoding="utf-8") as f:\n    print(int(f.read()) + 50)`,
+            choices: ["250", "150", "350", "20050"], answer: 0,
+            explanation: 'ファイルには最終的に "200" が残ります。int("200") + 50 = 250 と計算されます。'
+        },
+
+        // M13: 【第6回】CSV形式データの文字列分割（strip と split）
+        {
+            id: "M13_1", category: "mini", themeId: "M13", themeTitle: "第6回: CSV文字列操作 (strip/split)",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `line = "勇者,100,50\\n"\ndata = line.strip().split(",")\nprint(data[0], int(data[1]) + 20)`,
+            choices: ["勇者 120", "勇者 10020", "勇者 100", "勇者 100,50"], answer: 0,
+            explanation: '.strip() で末尾改行を除去し、.split(",") で [\'勇者\', \'100\', \'50\'] に分割されます。data[0]は"勇者"、int(data[1]) + 20 は 100 + 20 = 120 です。'
+        },
+        {
+            id: "M13_2", category: "mini", themeId: "M13", themeTitle: "第6回: CSV文字列操作 (strip/split)",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `line = "魔法使い,60,100\\n"\ndata = line.strip().split(",")\nprint(data[0], int(data[2]) + 10)`,
+            choices: ["魔法使い 110", "魔法使い 70", "魔法使い 10010", "エラーになる"], answer: 0,
+            explanation: 'data[2] は "100" です。int("100") + 10 = 110 となり、名前と合わさって「魔法使い 110」となります。'
+        },
+        {
+            id: "M13_3", category: "mini", themeId: "M13", themeTitle: "第6回: CSV文字列操作 (strip/split)",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `line = "戦士,200,10\\n"\ndata = line.strip().split(",")\nprint(data[0], int(data[1]) - 50)`,
+            choices: ["戦士 150", "戦士 200", "戦士 10", "エラーになる"], answer: 0,
+            explanation: 'data[0] は "戦士"、int(data[1]) - 50 は 200 - 50 = 150 となります。'
+        },
+        {
+            id: "M13_4", category: "mini", themeId: "M13", themeTitle: "第6回: CSV文字列操作 (strip/split)",
+            instruction: "以下のPythonコードを実行したとき、画面に出力される結果として正しいものを1つ選びなさい。",
+            code: `line = "ポーション,50,3\\n"\ndata = line.strip().split(",")\n# 単価 * 個数\nprint(data[0], int(data[1]) * int(data[2]))`,
+            choices: ["ポーション 150", "ポーション 503", "ポーション 53", "エラーになる"], answer: 0,
+            explanation: 'int(data[1]) は 50、int(data[2]) は 3 です。50 * 3 = 150 と計算されます。'
+        },
+
+        // ========================================================
+        // 【RPG穴埋めコーディング】全10空欄 × 各4題 = 40問
+        // ========================================================
+
+        // F01: 大問1 [ 空欄 ① ] 例外ブロック開始（try:）
+        {
+            id: "F01_1", category: "fill", themeId: "F01", themeTitle: "穴埋め①: 例外処理の開始",
+            instruction: "以下のコードの [ 空欄 ① ] に入る最も適切なコードを選びなさい。",
+            code: `def cast_spell(mp, cost):\n    # [ 空欄 ① ] 例外が発生する可能性がある処理の開始\n    ???\n        if mp < cost:\n            raise ValueError("MPが足りません！")\n        mp -= cost\n        print(f"魔法を発動！ 残りMP: {mp}")\n    except ValueError as e:\n        print(f"エラー: {e}")`,
+            choices: ["try:", "catch:", "test:", "error:"], answer: 0,
+            explanation: "Pythonで例外が発生する可能性のある処理を囲むキーワードは try: です（catch は他言語の構文でPythonにはありません）。"
+        },
+        {
+            id: "F01_2", category: "fill", themeId: "F01", themeTitle: "穴埋め①: 例外処理の開始",
+            instruction: "以下のコードの [ 空欄 ① ] に入る最も適切なコードを選びなさい。",
+            code: `def heal_player(potion_count):\n    # [ 空欄 ① ] 例外処理ブロックの開始\n    ???\n        if potion_count <= 0:\n            raise ValueError("ポーションがありません！")\n        potion_count -= 1\n        print("回復しました！")\n    except ValueError as e:\n        print(f"失敗: {e}")`,
+            choices: ["try:", "begin:", "check:", "catch:"], answer: 0,
+            explanation: "例外を捕捉して処理を開始するための構文ブロックの先頭には try: を記述します。"
+        },
+        {
+            id: "F01_3", category: "fill", themeId: "F01", themeTitle: "穴埋め①: 例外処理の開始",
+            instruction: "以下のコードの [ 空欄 ① ] に入る最も適切なコードを選びなさい。",
+            code: `def buy_weapon(money, price):\n    # [ 空欄 ① ]\n    ???\n        if money < price:\n            raise ValueError("所持金が足りません！")\n        money -= price\n        print("購入完了！")\n    except ValueError as e:\n        print(e)`,
+            choices: ["try:", "except:", "guard:", "test:"], answer: 0,
+            explanation: "例外発生をテスト・監視するブロックの宣言は try: です。"
+        },
+        {
+            id: "F01_4", category: "fill", themeId: "F01", themeTitle: "穴埋め①: 例外処理の開始",
+            instruction: "以下のコードの [ 空欄 ① ] に入る最も適切なコードを選びなさい。",
+            code: `def use_stamina(stamina, cost):\n    # [ 空欄 ① ]\n    ???\n        if stamina < cost:\n            raise ValueError("スタミナ不足")\n        stamina -= cost\n    except ValueError as e:\n        print(e)`,
+            choices: ["try:", "catch:", "error:", "run:"], answer: 0,
+            explanation: "例外の可能性があるブロックは必ず try: で開始します。"
+        },
+
+        // F02: 大問1 [ 空欄 ② ] 例外キャッチ構文（except ValueError as e:）
+        {
+            id: "F02_1", category: "fill", themeId: "F02", themeTitle: "穴埋め②: 例外オブジェクトの捕捉",
+            instruction: "以下のコードの [ 空欄 ② ] に入る最も適切なコードを選びなさい。",
+            code: `def cast_spell(mp, cost):\n    try:\n        if mp < cost:\n            raise ValueError("MPが足りません！")\n        mp -= cost\n    # [ 空欄 ② ] 指定したエラーをキャッチし、変数 e に格納\n    ???\n        print(f"エラー: {e}")`,
+            choices: ["except ValueError as e:", "catch ValueError as e:", "except (ValueError = e):", "if ValueError as e:"], answer: 0,
+            explanation: "Pythonでは except エラー型 as 変数名: の構文を用いて発生した例外オブジェクトを変数（e など）に格納します。"
+        },
+        {
+            id: "F02_2", category: "fill", themeId: "F02", themeTitle: "穴埋め②: 例外オブジェクトの捕捉",
+            instruction: "以下のコードの [ 空欄 ② ] に入る最も適切なコードを選びなさい。",
+            code: `def parse_level(lv_str):\n    try:\n        return int(lv_str)\n    # [ 空欄 ② ] ValueErrorをキャッチして変数 err に入れる\n    ???\n        print(f"変換エラー: {err}")\n        return 1`,
+            choices: ["except ValueError as err:", "catch ValueError as err:", "except (err = ValueError):", "except err in ValueError:"], answer: 0,
+            explanation: "エラー変数を受け取るには as 変数名 を使用し、except ValueError as err: と書きます。"
+        },
+        {
+            id: "F02_3", category: "fill", themeId: "F02", themeTitle: "穴埋め②: 例外オブジェクトの捕捉",
+            instruction: "以下のコードの [ 空欄 ② ] に入る最も適切なコードを選びなさい。",
+            code: `def get_item(items, index):\n    try:\n        return items[index]\n    # [ 空欄 ② ] IndexErrorを変数 e に格納して捕捉\n    ???\n        print(f"インデックス範囲外: {e}")`,
+            choices: ["except IndexError as e:", "catch IndexError as e:", "except IndexError -> e:", "except e as IndexError:"], answer: 0,
+            explanation: "Pythonの構文規則では except 例外クラス as 変数名: と指定します。"
+        },
+        {
+            id: "F02_4", category: "fill", themeId: "F02", themeTitle: "穴埋め②: 例外オブジェクトの捕捉",
+            instruction: "以下のコードの [ 空欄 ② ] に入る最も適切なコードを選びなさい。",
+            code: `def calc_damage(dmg, def_val):\n    try:\n        return dmg // def_val\n    # [ 空欄 ② ] ゼロ除算エラーを変数 e に捕捉\n    ???\n        print(f"計算不能: {e}")`,
+            choices: ["except ZeroDivisionError as e:", "catch ZeroDivisionError as e:", "except (ZeroDivisionError as e)", "if ZeroDivisionError as e:"], answer: 0,
+            explanation: "ZeroDivisionError の捕捉も同様に except ZeroDivisionError as e: です。"
+        },
+
+        // F03: 大問1 [ 空欄 ③ ] 終了時確定処理（finally:）
+        {
+            id: "F03_1", category: "fill", themeId: "F03", themeTitle: "穴埋め③: finallyブロック",
+            instruction: "以下のコードの [ 空欄 ③ ] に入る最も適切なコードを選びなさい。",
+            code: `def cast_spell(mp, cost):\n    try:\n        mp -= cost\n    except ValueError as e:\n        print(e)\n    # [ 空欄 ③ ] 例外の有無にかかわらず最後に必ず実行されるブロック\n    ???\n        print("--- ターン終了 ---")`,
+            choices: ["finally:", "always:", "end:", "last:"], answer: 0,
+            explanation: "例外が発生したかどうかにかかわらず、最後に必ず実行されるクリーンアップブロックには finally: を指定します。"
+        },
+        {
+            id: "F03_2", category: "fill", themeId: "F03", themeTitle: "穴埋め③: finallyブロック",
+            instruction: "以下のコードの [ 空欄 ③ ] に入る最も適切なコードを選びなさい。",
+            code: `def battle_action():\n    try:\n        print("行動開始")\n    except Exception as e:\n        print(e)\n    # [ 空欄 ③ ] 最後に必ずメッセージを表示\n    ???\n        print("--- バトル終了 ---")`,
+            choices: ["finally:", "complete:", "then:", "after:"], answer: 0,
+            explanation: "例外有無に関わらず実行を保証するキーワードは finally: です。"
+        },
+        {
+            id: "F03_3", category: "fill", themeId: "F03", themeTitle: "穴埋め③: finallyブロック",
+            instruction: "以下のコードの [ 空欄 ③ ] に入る最も適切なコードを選びなさい。",
+            code: `def connect_server():\n    try:\n        print("接続中...")\n    except ConnectionError:\n        print("エラー")\n    # [ 空欄 ③ ] 接続成否にかかわらず後片付け\n    ???\n        print("クローズ処理完了")`,
+            choices: ["finally:", "always:", "final:", "end:"], answer: 0,
+            explanation: "後片付け処理（クローズ等）を確実に実行するためのブロックは finally: です。"
+        },
+        {
+            id: "F03_4", category: "fill", themeId: "F03", themeTitle: "穴埋め③: finallyブロック",
+            instruction: "以下のコードの [ 空欄 ③ ] に入る最も適切なコードを選びなさい。",
+            code: `def save_player_data():\n    try:\n        print("保存中")\n    except IOError:\n        print("失敗")\n    # [ 空欄 ③ ]\n    ???\n        print("ログ記録完了")`,
+            choices: ["finally:", "finally();", "done:", "finish:"], answer: 0,
+            explanation: "コロン付きのキーワード finally: が正しい構文です。"
+        },
+
+        // F04: 大問2 [ 空欄 ④ ] クラスの継承宣言（class Mage(Character):）
+        {
+            id: "F04_1", category: "fill", themeId: "F04", themeTitle: "穴埋め④: クラス継承の構文",
+            instruction: "以下のコードの [ 空欄 ④ ] に入る最も適切なコードを選びなさい。",
+            code: `class Character:\n    def __init__(self, name, hp):\n        self.name = name\n        self.hp = hp\n\n# [ 空欄 ④ ] Characterクラスを継承した子クラス Mage を定義\n???\n    def __init__(self, name, hp, mp):\n        super().__init__(name, hp)\n        self.mp = mp`,
+            choices: ["class Mage(Character):", "class Mage extends Character:", "class Mage:", "def Mage(Character):"], answer: 0,
+            explanation: "Pythonでクラスを継承する場合、クラス名の後ろの丸かっこに親クラス名を指定して class 子クラス名(親クラス名): と記述します。"
+        },
+        {
+            id: "F04_2", category: "fill", themeId: "F04", themeTitle: "穴埋め④: クラス継承の構文",
+            instruction: "以下のコードの [ 空欄 ④ ] に入る最も適切なコードを選びなさい。",
+            code: `class Player:\n    def __init__(self, name):\n        self.name = name\n\n# [ 空欄 ④ ] Playerを継承した Warrior クラスを定義\n???\n    def slash(self):\n        print("斬撃！")`,
+            choices: ["class Warrior(Player):", "class Warrior inherits Player:", "def Warrior(Player):", "class Warrior.Player:"], answer: 0,
+            explanation: "継承宣言は class Warrior(Player): です（Javaなどの extends や inherits は使いません）。"
+        },
+        {
+            id: "F04_3", category: "fill", themeId: "F04", themeTitle: "穴埋め④: クラス継承の構文",
+            instruction: "以下のコードの [ 空欄 ④ ] に入る最も適切なコードを選びなさい。",
+            code: `class Monster:\n    def __init__(self, name):\n        self.name = name\n\n# [ 空欄 ④ ] Monsterを継承した Dragon クラスを定義\n???\n    def breath(self):\n        print("炎のブレス！")`,
+            choices: ["class Dragon(Monster):", "class Dragon extends Monster:", "class Dragon(self, Monster):", "new class Dragon(Monster):"], answer: 0,
+            explanation: "丸かっこで親クラスを囲む class Dragon(Monster): が正解です。"
+        },
+        {
+            id: "F04_4", category: "fill", themeId: "F04", themeTitle: "穴埋め④: クラス継承の構文",
+            instruction: "以下のコードの [ 空欄 ④ ] に入る最も適切なコードを選びなさい。",
+            code: `class Weapon:\n    pass\n\n# [ 空欄 ④ ] Weaponを継承した Sword クラスを定義\n???\n    pass`,
+            choices: ["class Sword(Weapon):", "class Sword:", "class Sword(super):", "def Sword(Weapon):"], answer: 0,
+            explanation: "Weapon を親クラスとする定義は class Sword(Weapon): です。"
+        },
+
+        // F05: 大問2 [ 空欄 ⑤ ] 親クラスの初期化（super().__init__(name, hp)）
+        {
+            id: "F05_1", category: "fill", themeId: "F05", themeTitle: "穴埋め⑤: super().__init__",
+            instruction: "以下のコードの [ 空欄 ⑤ ] に入る最も適切なコードを選びなさい。",
+            code: `class Mage(Character):\n    def __init__(self, name, hp, mp):\n        # [ 空欄 ⑤ ] 親クラスのコンストラクタを呼び出して初期化\n        ???\n        self.mp = mp`,
+            choices: ["super().__init__(name, hp)", "self.__init__(name, hp)", "parent.__init__(name, hp)", "Character(name, hp)"], answer: 0,
+            explanation: "子クラスから親クラスのメソッドを安全に呼び出すには super() を使用し、super().__init__(引数...) と記述します。"
+        },
+        {
+            id: "F05_2", category: "fill", themeId: "F05", themeTitle: "穴埋め⑤: super().__init__",
+            instruction: "以下のコードの [ 空欄 ⑤ ] に入る最も適切なコードを選びなさい。",
+            code: `class Warrior(Character):\n    def __init__(self, name, hp, power):\n        # [ 空欄 ⑤ ] 親クラスの初期化処理を呼び出す\n        ???\n        self.power = power`,
+            choices: ["super().__init__(name, hp)", "super(name, hp)", "this.__init__(name, hp)", "Character.__init__(name, hp)"], answer: 0,
+            explanation: "親クラス Character の __init__ を呼ぶには super().__init__(name, hp) と書きます。"
+        },
+        {
+            id: "F05_3", category: "fill", themeId: "F05", themeTitle: "穴埋め⑤: super().__init__",
+            instruction: "以下のコードの [ 空欄 ⑤ ] に入る最も適切なコードを選びなさい。",
+            code: `class Item:\n    def __init__(self, name):\n        self.name = name\n\nclass Potion(Item):\n    def __init__(self, name, heal_amount):\n        # [ 空欄 ⑤ ]\n        ???\n        self.heal_amount = heal_amount`,
+            choices: ["super().__init__(name)", "self.__init__(name)", "Item.__init__(name)", "super().Item(name)"], answer: 0,
+            explanation: "親クラスの引数が name のみの場合、super().__init__(name) と親のシグネチャに合わせて呼び出します。"
+        },
+        {
+            id: "F05_4", category: "fill", themeId: "F05", themeTitle: "穴埋め⑤: super().__init__",
+            instruction: "以下のコードの [ 空欄 ⑤ ] に入る最も適切なコードを選びなさい。",
+            code: `class Car(Vehicle):\n    def __init__(self, speed, wheels):\n        # [ 空欄 ⑤ ]\n        ???\n        self.wheels = wheels`,
+            choices: ["super().__init__(speed)", "parent.__init__(speed)", "Vehicle.__init__(speed)", "super.init(speed)"], answer: 0,
+            explanation: "組み込み関数 super() を用いた super().__init__(speed) が正解です。"
+        },
+
+        // F06: 大問2 [ 空欄 ⑥ ] インスタンス属性の更新（self.mp -= 10）
+        {
+            id: "F06_1", category: "fill", themeId: "F06", themeTitle: "穴埋め⑥: インスタンス属性の更新",
+            instruction: "以下のコードの [ 空欄 ⑥ ] に入る最も適切なコードを選びなさい。",
+            code: `class Mage(Character):\n    def attack(self):\n        # [ 空欄 ⑥ ] 自身のMPを10消費する処理\n        ???\n        print(f"{self.name} は魔法を唱えた！ (残りMP: {self.mp})")`,
+            choices: ["self.mp -= 10", "mp -= 10", "Character.mp -= 10", "self.mp = -10"], answer: 0,
+            explanation: "インスタンス変数 mp を減算更新するには必ず self. を前に付けて self.mp -= 10 と記述します。"
+        },
+        {
+            id: "F06_2", category: "fill", themeId: "F06", themeTitle: "穴埋め⑥: インスタンス属性の更新",
+            instruction: "以下のコードの [ 空欄 ⑥ ] に入る最も適切なコードを選びなさい。",
+            code: `class Player:\n    def take_damage(self, dmg):\n        # [ 空欄 ⑥ ] 自身のHPから dmg 分を減算する処理\n        ???\n        print(f"残りHP: {self.hp}")`,
+            choices: ["self.hp -= dmg", "hp -= dmg", "self.hp = dmg", "Player.hp -= dmg"], answer: 0,
+            explanation: "自身の属性 hp から引数 dmg を引くため、self.hp -= dmg となります。"
+        },
+        {
+            id: "F06_3", category: "fill", themeId: "F06", themeTitle: "穴埋め⑥: インスタンス属性の更新",
+            instruction: "以下のコードの [ 空欄 ⑥ ] に入る最も適切なコードを選びなさい。",
+            code: `class ItemBag:\n    def use_item(self):\n        # [ 空欄 ⑥ ] 個数 count を1減らす\n        ???\n        print("アイテムを使用しました")`,
+            choices: ["self.count -= 1", "count -= 1", "self.count = -1", "ItemBag.count -= 1"], answer: 0,
+            explanation: "インスタンス変数 count を更新するため self.count -= 1 が正解です。"
+        },
+        {
+            id: "F06_4", category: "fill", themeId: "F06", themeTitle: "穴埋め⑥: インスタンス属性の更新",
+            instruction: "以下のコードの [ 空欄 ⑥ ] に入る最も適切なコードを選びなさい。",
+            code: `class Character:\n    def level_up(self):\n        # [ 空欄 ⑥ ] レベルを1増やす\n        ???\n        print(f"レベルアップ！ Lv.{self.level}")`,
+            choices: ["self.level += 1", "level += 1", "self.level = +1", "this.level += 1"], answer: 0,
+            explanation: "self.level += 1 によりインスタンスの level 属性がインクリメントされます。"
+        },
+
+        // F07: 大問3 [ 空欄 ⑦ ] ファイルの新規書き込みオープン
+        {
+            id: "F07_1", category: "fill", themeId: "F07", themeTitle: "穴埋め⑦: with openの書き込み",
+            instruction: "以下のコードの [ 空欄 ⑦ ] に入る最も適切なコードを選びなさい。",
+            code: `filename = "party_list.csv"\n\n# [ 空欄 ⑦ ] ファイルを新規書き込みモード（UTF-8）で安全に開く\n???\n    f.write("名前,職業,HP\\n")`,
+            choices: [
+                'with open(filename, mode="w", encoding="utf-8") as f:',
+                'open(filename, mode="w", encoding="utf-8") as f:',
+                'with file(filename, mode="write", utf8=True):',
+                'with open(filename, mode="r", encoding="utf-8") as f:'
+            ], answer: 0,
+            explanation: 'ファイルの自動クローズを行う構文は with open(...) as 変数名: です。新規書き込みは mode="w"、文字コード指定は encoding="utf-8" を用います。'
+        },
+        {
+            id: "F07_2", category: "fill", themeId: "F07", themeTitle: "穴埋め⑦: with openの書き込み",
+            instruction: "以下のコードの [ 空欄 ⑦ ] に入る最も適切なコードを選びなさい。",
+            code: `filename = "items.csv"\n\n# [ 空欄 ⑦ ] 書き込みモードで開く\n???\n    f.write("アイテム名,価格\\n")`,
+            choices: [
+                'with open(filename, mode="w", encoding="utf-8") as f:',
+                'with open(filename, mode="a", encoding="utf-8"):',
+                'with open(filename, mode="read", encoding="utf-8") as f:',
+                'file.open(filename, "w") as f:'
+            ], answer: 0,
+            explanation: 'mode="w"（上書き新規保存）で変数 f として受け取る正しい構文です。'
+        },
+        {
+            id: "F07_3", category: "fill", themeId: "F07", themeTitle: "穴埋め⑦: with openの書き込み",
+            instruction: "以下のコードの [ 空欄 ⑦ ] に入る最も適切なコードを選びなさい。",
+            code: `path = "score.txt"\n\n# [ 空欄 ⑦ ] 書き込みモード(UTF-8)でオープン\n???\n    f.write("Score: 100\\n")`,
+            choices: [
+                'with open(path, mode="w", encoding="utf-8") as f:',
+                'open(path, mode="w") as f:',
+                'with open(path, "r", "utf-8") as f:',
+                'with read(path, mode="w") as f:'
+            ], answer: 0,
+            explanation: 'with open(path, mode="w", encoding="utf-8") as f: の形式が最も推奨される安全なファイル操作です。'
+        },
+        {
+            id: "F07_4", category: "fill", themeId: "F07", themeTitle: "穴埋め⑦: with openの書き込み",
+            instruction: "以下のコードの [ 空欄 ⑦ ] に入る最も適切なコードを選びなさい。",
+            code: `filename = "data.csv"\n\n# [ 空欄 ⑦ ]\n???\n    f.write("test")`,
+            choices: [
+                'with open(filename, mode="w", encoding="utf-8") as f:',
+                'with open(filename, mode="write"):',
+                'with file.open(filename, mode="w") as f:',
+                'open with (filename, mode="w") as f:'
+            ], answer: 0,
+            explanation: '組み込み関数 open に mode="w" と encoding="utf-8" を渡す構文が正解です。'
+        },
+
+        // F08: 大問3 [ 空欄 ⑧ ] リスト内包表記による文字列リスト生成
+        {
+            id: "F08_1", category: "fill", themeId: "F08", themeTitle: "穴埋め⑧: リスト内包表記での整形",
+            instruction: "以下のコードの [ 空欄 ⑧ ] に入る最も適切なコードを選びなさい。",
+            code: `party = [\n    {"name": "勇者", "job": "戦士", "hp": 150},\n    {"name": "メルリン", "job": "魔法使い", "hp": 80}\n]\n\n# [ 空欄 ⑧ ] リスト内包表記で各冒険者の「名前,職業,HP\\n」の文字列リストを生成\nlines = ???`,
+            choices: [
+                "[f\"{p['name']},{p['job']},{p['hp']}\\n\" for p in party]",
+                "[p for p in party if f\"{p['name']}\\n\"]",
+                "for p in party: [f\"{p['name']},{p['job']},{p['hp']}\\n\"]",
+                "{f\"{p['name']},{p['job']},{p['hp']}\\n\" in party}"
+            ], answer: 0,
+            explanation: "リスト内包表記 [式 for 変数 in リスト] により、辞書 p の各キーを取り出してCSV行文字列にしたリストを1行で作成します。"
+        },
+        {
+            id: "F08_2", category: "fill", themeId: "F08", themeTitle: "穴埋め⑧: リスト内包表記での整形",
+            instruction: "以下のコードの [ 空欄 ⑧ ] に入る最も適切なコードを選びなさい。",
+            code: `items = [\n    {"name": "薬草", "price": 50},\n    {"name": "毒消し", "price": 30}\n]\n\n# [ 空欄 ⑧ ] 「名前,価格\\n」のリストを作成\nlines = ???`,
+            choices: [
+                "[f\"{i['name']},{i['price']}\\n\" for i in items]",
+                "[i for i in items if i['name']]",
+                "for i in items: f\"{i['name']}\\n\"",
+                "(f\"{i['name']},{i['price']}\\n\" for items)"
+            ], answer: 0,
+            explanation: "[f\"{i['name']},{i['price']}\\n\" for i in items] の内包表記構文が正解です。"
+        },
+        {
+            id: "F08_3", category: "fill", themeId: "F08", themeTitle: "穴埋め⑧: リスト内包表記での整形",
+            instruction: "以下のコードの [ 空欄 ⑧ ] に入る最も適切なコードを選びなさい。",
+            code: `members = [\"太郎\", \"花子\", \"次郎\"]\n\n# [ 空欄 ⑧ ] 各名前に「さん\\n」を付けたリストを作成\nlines = ???`,
+            choices: [
+                "[f\"{m}さん\\n\" for m in members]",
+                "[m for m in members if \"さん\"]",
+                "{f\"{m}さん\\n\" for m in members}",
+                "for m in members: f\"{m}さん\""
+            ], answer: 0,
+            explanation: "[f\"{m}さん\\n\" for m in members] により各名前に接尾辞を付けた新しい文字列リストが得られます。"
+        },
+        {
+            id: "F08_4", category: "fill", themeId: "F08", themeTitle: "穴埋め⑧: リスト内包表記での整形",
+            instruction: "以下のコードの [ 空欄 ⑧ ] に入る最も適切なコードを選びなさい。",
+            code: `scores = [80, 95, 60]\n\n# [ 空欄 ⑧ ] 各点数を文字列にして末尾に改行を付けたリストを作成\nlines = ???`,
+            choices: [
+                "[f\"{s}\\n\" for s in scores]",
+                "[s in scores for f\"{s}\\n\"]",
+                "[f\"{s}\" for in scores]",
+                "(s + \"\\n\" for s in scores)"
+            ], answer: 0,
+            explanation: "角括弧 [式 for 変数 in リスト] の形式である [f\"{s}\\n\" for s in scores] が正解です。"
+        },
+
+        // F09: 大問3 [ 空欄 ⑨ ] 文字列リストの一括書き込み（writelines）
+        {
+            id: "F09_1", category: "fill", themeId: "F09", themeTitle: "穴埋め⑨: writelinesによる一括書き込み",
+            instruction: "以下のコードの [ 空欄 ⑨ ] に入る最も適切なコードを選びなさい。",
+            code: `lines = [\"A,100\\n\", \"B,200\\n\"]\nwith open("test.csv", mode="w", encoding="utf-8") as f:\n    # [ 空欄 ⑨ ] 文字列のリストを一括でファイルに書き込む\n    ???`,
+            choices: ["f.writelines(lines)", "f.write(lines)", "lines.write(f)", "f.append(lines)"], answer: 0,
+            explanation: "単一の文字列を書き込むのは write() ですが、文字列のリストを一括で書き込む場合は writelines() メソッドを使用します（writeにリストを渡すとTypeErrorになります）。"
+        },
+        {
+            id: "F09_2", category: "fill", themeId: "F09", themeTitle: "穴埋め⑨: writelinesによる一括書き込み",
+            instruction: "以下のコードの [ 空欄 ⑨ ] に入る最も適切なコードを選びなさい。",
+            code: `data_list = [\"1行目\\n\", \"2行目\\n\"]\nwith open("log.txt", mode="w", encoding="utf-8") as f:\n    # [ 空欄 ⑨ ] リストを丸ごと書き込む\n    ???`,
+            choices: ["f.writelines(data_list)", "f.write_all(data_list)", "f.write_lines(data_list)", "data_list.save(f)"], answer: 0,
+            explanation: "Pythonの標準ファイル操作メソッド名は writelines() です。"
+        },
+        {
+            id: "F09_3", category: "fill", themeId: "F09", themeTitle: "穴埋め⑨: writelinesによる一括書き込み",
+            instruction: "以下のコードの [ 空欄 ⑨ ] に入る最も適切なコードを選びなさい。",
+            code: `rows = [\"勇者,100\\n\", \"戦士,150\\n\"]\nwith open("party.csv", mode="w", encoding="utf-8") as f:\n    # [ 空欄 ⑨ ]\n    ???`,
+            choices: ["f.writelines(rows)", "f.write(rows)", "f.print(rows)", "f.dump(rows)"], answer: 0,
+            explanation: "文字列リストの一括書き出しには f.writelines(rows) を使用します。"
+        },
+        {
+            id: "F09_4", category: "fill", themeId: "F09", themeTitle: "穴埋め⑨: writelinesによる一括書き込み",
+            instruction: "以下のコードの [ 空欄 ⑨ ] に入る最も適切なコードを選びなさい。",
+            code: `records = [\"OK\\n\", \"NG\\n\"]\nwith open("result.txt", mode="w", encoding="utf-8") as f:\n    # [ 空欄 ⑨ ]\n    ???`,
+            choices: ["f.writelines(records)", "f.writelines_all(records)", "f.insert(records)", "f.write(records)"], answer: 0,
+            explanation: "f.writelines(records) が正解です。"
+        },
+
+        // F10: 大問3 [ 空欄 ⑩ ] ファイル全行の一括読み込み（readlines）
+        {
+            id: "F10_1", category: "fill", themeId: "F10", themeTitle: "穴埋め⑩: readlinesによる一括読込",
+            instruction: "以下のコードの [ 空欄 ⑩ ] に入る最も適切なコードを選びなさい。",
+            code: `with open("party_list.csv", mode="r", encoding="utf-8") as f:\n    # [ 空欄 ⑩ ] ファイルの全行をリストとして一括で読み込む\n    saved_data = ???\n    print(f"保存行数: {len(saved_data)}行")`,
+            choices: ["f.readlines()", "f.readline()", "f.read_all()", "f.lines()"], answer: 0,
+            explanation: "ファイルの内容を1行ずつの文字列リストとして全て読み込むメソッドは readlines() です（readline() は1行のみ読み込みます）。"
+        },
+        {
+            id: "F10_2", category: "fill", themeId: "F10", themeTitle: "穴埋め⑩: readlinesによる一括読込",
+            instruction: "以下のコードの [ 空欄 ⑩ ] に入る最も適切なコードを選びなさい。",
+            code: `with open("items.csv", mode="r", encoding="utf-8") as f:\n    # [ 空欄 ⑩ ] 全行をリストで取得\n    all_lines = ???\n    print(f"全{len(all_lines)}行")`,
+            choices: ["f.readlines()", "f.read()", "f.get_lines()", "f.readline()"], answer: 0,
+            explanation: "各行を要素とするリストとして読み出すのは f.readlines() です。"
+        },
+        {
+            id: "F10_3", category: "fill", themeId: "F10", themeTitle: "穴埋め⑩: readlinesによる一括読込",
+            instruction: "以下のコードの [ 空欄 ⑩ ] に入る最も適切なコードを選びなさい。",
+            code: `with open("data.txt", mode="r", encoding="utf-8") as f:\n    # [ 空欄 ⑩ ] 全行リストの取得\n    lines = ???\n    for line in lines:\n        print(line.strip())`,
+            choices: ["f.readlines()", "f.read_lines()", "f.load()", "f.readline()"], answer: 0,
+            explanation: "Pythonの標準ファイル操作メソッドは f.readlines() です。"
+        },
+        {
+            id: "F10_4", category: "fill", themeId: "F10", themeTitle: "穴埋め⑩: readlinesによる一括読込",
+            instruction: "以下のコードの [ 空欄 ⑩ ] に入る最も適切なコードを選びなさい。",
+            code: `with open("log.txt", mode="r", encoding="utf-8") as f:\n    # [ 空欄 ⑩ ]\n    data = ???\n    first_line = data[0]`,
+            choices: ["f.readlines()", "f.readline()", "f.read()", "f.rows()"], answer: 0,
+            explanation: "リストとして取得しインデックス [0] でアクセスするため、全行リストを返す f.readlines() が適切です。"
+        }
+    ];
+
+    // ==========================================
+    // アプリケーション状態管理
+    // ==========================================
+    let currentCategory = 'all'; // 'all', 'mini', 'fill'
+    let selectedQuestionCount = 10;
+    let selectedQuestionIds = new Set();
+
+    let activeQuizList = [];
+    let currentQuestionIndex = 0;
+    let currentScore = 0;
+    let currentQuizAnswered = false;
+
+    // ローカルストレージキー
+    const STORAGE_KEY = 'python2_quiz_history_v1';
+
+    function getHistory() {
+        try {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : {};
+        } catch(e) {
+            return {};
+        }
+    }
+
+    function saveResult(qId, isCorrect) {
+        const hist = getHistory();
+        hist[qId] = {
+            correct: isCorrect,
+            timestamp: Date.now()
+        };
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(hist));
+        } catch(e) {}
+    }
+
+    function clearAllHistory() {
+        if (confirm("これまでの正誤履歴をすべてリセットしますか？")) {
+            localStorage.removeItem(STORAGE_KEY);
+            updateStats();
+            alert("履歴をリセットしました。");
+        }
+    }
+
+    // ==========================================
+    // 画面遷移
+    // ==========================================
+    function goToScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(screenId);
+        if (target) {
+            target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        if (screenId === 'screen-home') {
+            updateStats();
+        }
+    }
+
+    // カテゴリ選択
+    function setCategory(cat) {
+        currentCategory = cat;
+        document.querySelectorAll('.category-tab').forEach((tab, idx) => {
+            tab.classList.remove('active');
+        });
+        const clickedTab = event.currentTarget;
+        if (clickedTab) clickedTab.classList.add('active');
+        updateStats();
+    }
+
+    function getFilteredQuestions() {
+        if (currentCategory === 'mini') {
+            return quizDatabase.filter(q => q.category === 'mini');
+        } else if (currentCategory === 'fill') {
+            return quizDatabase.filter(q => q.category === 'fill');
+        }
+        return quizDatabase;
+    }
+
+    // 統計サマリーの更新
+    function updateStats() {
+        const questions = getFilteredQuestions();
+        const total = questions.length;
+        const hist = getHistory();
+
+        let solved = 0;
+        let correct = 0;
+        let incorrectIds = [];
+
+        questions.forEach(q => {
+            if (hist[q.id]) {
+                solved++;
+                if (hist[q.id].correct) {
+                    correct++;
+                } else {
+                    incorrectIds.push(q.id);
+                }
+            }
+        });
+
+        document.getElementById('stat-total-count').innerText = total;
+        document.getElementById('stat-solved-count').innerText = solved;
+        document.getElementById('stat-correct-rate').innerText = solved > 0 ? Math.round((correct / solved) * 100) + '%' : '0%';
+
+        // 苦手モードの説明更新
+        const weakDesc = document.getElementById('weak-mode-desc');
+        const weakBtn = document.getElementById('btn-weak-mode');
+        if (incorrectIds.length > 0) {
+            weakDesc.innerText = `過去に間違えた問題（${incorrectIds.length}問）を再復習します`;
+            weakBtn.style.opacity = '1';
+        } else {
+            weakDesc.innerText = '間違えた問題はありません（すべて正解または未解答）';
+            weakBtn.style.opacity = '0.7';
+        }
+    }
+
+    // ==========================================
+    // ランダムテスト
+    // ==========================================
+    function openRandomConfig() {
+        goToScreen('screen-random-config');
+    }
+
+    function setQuestionCount(count) {
+        selectedQuestionCount = count;
+        document.querySelectorAll('.count-btn').forEach(btn => btn.classList.remove('active'));
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        }
+        const info = document.getElementById('random-info-text');
+        const maxCount = getFilteredQuestions().length;
+        if (count === 'all') {
+            info.innerText = `現在選択中: 全${maxCount}問`;
+        } else {
+            info.innerText = `現在選択中: ${count}問（最大${maxCount}問中）`;
+        }
+    }
+
+    function startRandomQuiz() {
+        let pool = [...getFilteredQuestions()];
+        // シャッフル
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+
+        const count = selectedQuestionCount === 'all' ? pool.length : Math.min(selectedQuestionCount, pool.length);
+        activeQuizList = pool.slice(0, count);
+
+        if (activeQuizList.length === 0) {
+            alert("対象の問題がありません。");
+            return;
+        }
+
+        initQuiz();
+    }
+
+    // 苦手克服モード
+    function startWeakMode() {
+        const questions = getFilteredQuestions();
+        const hist = getHistory();
+        const weakQuestions = questions.filter(q => hist[q.id] && !hist[q.id].correct);
+
+        if (weakQuestions.length === 0) {
+            alert("現在、間違えた問題の履歴はありません！素晴らしいです。");
+            return;
+        }
+
+        // シャッフル
+        for (let i = weakQuestions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [weakQuestions[i], weakQuestions[j]] = [weakQuestions[j], weakQuestions[i]];
+        }
+
+        activeQuizList = weakQuestions;
+        initQuiz();
+    }
+
+    // ==========================================
+    // 問題選択モード
+    // ==========================================
+    function openThemeSelect() {
+        goToScreen('screen-theme-select');
+        renderThemeAccordion();
+    }
+
+    function renderThemeAccordion() {
+        const container = document.getElementById('theme-accordion-list');
+        container.innerHTML = '';
+        selectedQuestionIds.clear();
+
+        const questions = getFilteredQuestions();
+        const hist = getHistory();
+
+        // themeIdごとにグルーピング
+        const groups = {};
+        questions.forEach(q => {
+            if (!groups[q.themeId]) {
+                groups[q.themeId] = {
+                    title: q.themeTitle,
+                    category: q.category,
+                    items: []
+                };
+            }
+            groups[q.themeId].items.push(q);
+        });
+
+        Object.keys(groups).forEach(tId => {
+            const grp = groups[tId];
+            const div = document.createElement('div');
+            div.className = 'theme-group';
+
+            let chipsHtml = '';
+            grp.items.forEach((q, idx) => {
+                const h = hist[q.id];
+                let badge = '';
+                if (h) {
+                    badge = h.correct ? '<span class="chip-badge correct">○ 正解</span>' : '<span class="chip-badge incorrect">× 誤り</span>';
+                }
+                chipsHtml += `
+                    <div class="question-chip" id="chip-${q.id}" onclick="toggleSelectQuestion('${q.id}')">
+                        <span>類題${idx + 1}</span>
+                        ${badge}
+                    </div>
+                `;
+            });
+
+            div.innerHTML = `
+                <div class="theme-header" onclick="toggleGroupSelect('${tId}')">
+                    <span>${grp.title}</span>
+                    <span style="font-size:0.75rem; color:var(--text-sub);">全${grp.items.length}題</span>
+                </div>
+                <div class="theme-questions">
+                    ${chipsHtml}
+                </div>
+            `;
+            container.appendChild(div);
+        });
+
+        updateSelectCount();
+    }
+
+    function toggleSelectQuestion(qId) {
+        const chip = document.getElementById(`chip-${qId}`);
+        if (selectedQuestionIds.has(qId)) {
+            selectedQuestionIds.delete(qId);
+            chip.classList.remove('selected');
+        } else {
+            selectedQuestionIds.add(qId);
+            chip.classList.add('selected');
+        }
+        updateSelectCount();
+    }
+
+    function toggleGroupSelect(themeId) {
+        const questions = getFilteredQuestions().filter(q => q.themeId === themeId);
+        const allSelected = questions.every(q => selectedQuestionIds.has(q.id));
+
+        questions.forEach(q => {
+            const chip = document.getElementById(`chip-${q.id}`);
+            if (chip) {
+                if (allSelected) {
+                    selectedQuestionIds.delete(q.id);
+                    chip.classList.remove('selected');
+                } else {
+                    selectedQuestionIds.add(q.id);
+                    chip.classList.add('selected');
+                }
+            }
+        });
+        updateSelectCount();
+    }
+
+    function selectAllQuestions() {
+        const questions = getFilteredQuestions();
+        questions.forEach(q => {
+            selectedQuestionIds.add(q.id);
+            const chip = document.getElementById(`chip-${q.id}`);
+            if (chip) chip.classList.add('selected');
+        });
+        updateSelectCount();
+    }
+
+    function deselectAllQuestions() {
+        selectedQuestionIds.clear();
+        document.querySelectorAll('.question-chip').forEach(c => c.classList.remove('selected'));
+        updateSelectCount();
+    }
+
+    function selectIncorrectOnly() {
+        deselectAllQuestions();
+        const hist = getHistory();
+        const questions = getFilteredQuestions();
+        questions.forEach(q => {
+            if (hist[q.id] && !hist[q.id].correct) {
+                selectedQuestionIds.add(q.id);
+                const chip = document.getElementById(`chip-${q.id}`);
+                if (chip) chip.classList.add('selected');
+            }
+        });
+        updateSelectCount();
+    }
+
+    function updateSelectCount() {
+        const count = selectedQuestionIds.size;
+        document.getElementById('select-chip-count').innerText = count;
+        document.getElementById('btn-start-selected').disabled = (count === 0);
+    }
+
+    function startSelectedQuiz() {
+        if (selectedQuestionIds.size === 0) return;
+        const pool = quizDatabase.filter(q => selectedQuestionIds.has(q.id));
+        activeQuizList = pool;
+        initQuiz();
+    }
+
+    // ==========================================
+    // クイズ実行
+    // ==========================================
+    function initQuiz() {
+        currentQuestionIndex = 0;
+        currentScore = 0;
+        goToScreen('screen-quiz');
+        renderCurrentQuestion();
+    }
+
+    function renderCurrentQuestion() {
+        currentQuizAnswered = false;
+        const q = activeQuizList[currentQuestionIndex];
+        const total = activeQuizList.length;
+
+        document.getElementById('quiz-counter').innerText = `Q ${currentQuestionIndex + 1} / ${total}`;
+        document.getElementById('quiz-theme-tag').innerText = q.themeTitle;
+        document.getElementById('code-status-badge').innerText = q.category === 'mini' ? 'ミニコード読解' : 'RPG穴埋め';
+        document.getElementById('question-instruction-text').innerText = q.instruction;
+
+        // コードブロックの描画（穴埋めの場合は ??? または [ 空欄 ] をハイライト）
+        const codeElement = document.getElementById('quiz-code-block');
+        let formattedCode = escapeHtml(q.code);
+
+        if (q.category === 'fill') {
+            formattedCode = formattedCode.replace(/\?\?\?/g, '<span class="blank-highlight">  ここに当てはまるコード  </span>');
+        }
+        codeElement.innerHTML = formattedCode;
+
+        // 選択肢のシャッフル
+        const choicesContainer = document.getElementById('quiz-choices-container');
+        choicesContainer.innerHTML = '';
+
+        // 選択肢インデックスを配列化してシャッフル
+        const choiceIndices = [0, 1, 2, 3].slice(0, q.choices.length);
+        for (let i = choiceIndices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [choiceIndices[i], choiceIndices[j]] = [choiceIndices[j], choiceIndices[i]];
+        }
+
+        const labels = ['A', 'B', 'C', 'D'];
+        choiceIndices.forEach((origIdx, displayIdx) => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.onclick = () => handleAnswer(origIdx, btn);
+            btn.innerHTML = `
+                <span class="choice-key">${labels[displayIdx]}.</span>
+                <span class="choice-text">${escapeHtml(q.choices[origIdx])}</span>
+            `;
+            btn.dataset.origIndex = origIdx;
+            choicesContainer.appendChild(btn);
+        });
+
+        // 解説と次へボタンを隠す
+        const expCard = document.getElementById('quiz-explanation-card');
+        expCard.classList.remove('show');
+        document.getElementById('btn-next-question').style.display = 'none';
+    }
+
+    function handleAnswer(selectedIndex, clickedBtn) {
+        if (currentQuizAnswered) return;
+        currentQuizAnswered = true;
+
+        const q = activeQuizList[currentQuestionIndex];
+        const isCorrect = (selectedIndex === q.answer);
+
+        if (isCorrect) {
+            currentScore++;
+            clickedBtn.classList.add('correct');
+        } else {
+            clickedBtn.classList.add('incorrect');
+            // 正解ボタンを緑でハイライト表示
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                if (parseInt(btn.dataset.origIndex, 10) === q.answer) {
+                    btn.classList.add('correct');
+                }
+            });
+        }
+
+        // 全ボタン無効化
+        document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
+
+        // 履歴保存
+        saveResult(q.id, isCorrect);
+
+        // 解説表示
+        const expCard = document.getElementById('quiz-explanation-card');
+        const expTitle = document.getElementById('explanation-title-text');
+        const expText = document.getElementById('quiz-explanation-text');
+
+        if (isCorrect) {
+            expTitle.innerHTML = '🎉 <span style="color:var(--success);">正解！</span>';
+        } else {
+            expTitle.innerHTML = '😢 <span style="color:var(--danger);">不正解...（正解: ' + escapeHtml(q.choices[q.answer]) + '）</span>';
+        }
+        expText.innerHTML = escapeHtml(q.explanation);
+        expCard.classList.add('show');
+
+        // 次へボタンの表示
+        const nextBtn = document.getElementById('btn-next-question');
+        if (currentQuestionIndex < activeQuizList.length - 1) {
+            nextBtn.innerText = '次の問題へ ＞';
+        } else {
+            nextBtn.innerText = '結果を見る 🏁';
+        }
+        nextBtn.style.display = 'block';
+
+        // 快適なスクロール（解説が見えるようにスクロール）
+        setTimeout(() => {
+            expCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < activeQuizList.length - 1) {
+            currentQuestionIndex++;
+            renderCurrentQuestion();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            showResult();
+        }
+    }
+
+    function confirmQuit() {
+        if (confirm("テストを中断してトップに戻りますか？")) {
+            goToScreen('screen-home');
+        }
+    }
+
+    // ==========================================
+    // 結果表示
+    // ==========================================
+    function showResult() {
+        goToScreen('screen-result');
+        const total = activeQuizList.length;
+        const rate = Math.round((currentScore / total) * 100);
+
+        document.getElementById('result-score-text').innerText = `${currentScore} / ${total}`;
+        document.getElementById('res-correct-count').innerText = currentScore;
+        document.getElementById('res-incorrect-count').innerText = total - currentScore;
+        document.getElementById('res-accuracy-rate').innerText = `${rate}%`;
+
+        const emoji = document.getElementById('result-emoji');
+        const msg = document.getElementById('result-msg-text');
+
+        if (rate === 100) {
+            emoji.innerText = '🏆';
+            msg.innerText = '全問正解！パーフェクトです！中間試験本番でも満点が狙えます！';
+        } else if (rate >= 80) {
+            emoji.innerText = '🌟';
+            msg.innerText = '素晴らしい得点です！基礎も応用もしっかり身についています。';
+        } else if (rate >= 60) {
+            emoji.innerText = '👍';
+            msg.innerText = '合格ライン突破！間違えた箇所を復習してさらに盤石にしましょう。';
+        } else {
+            emoji.innerText = '💪';
+            msg.innerText = 'もう一歩！「苦手克服モード」や「問題選択モード」で繰り返し練習してみましょう！';
+        }
+    }
+
+    function retryCurrentQuiz() {
+        // 同じ出題リストをシャッフルして再開
+        for (let i = activeQuizList.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [activeQuizList[i], activeQuizList[j]] = [activeQuizList[j], activeQuizList[i]];
+        }
+        initQuiz();
+    }
+
+    // ユーティリティ
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // 初期化
+    window.addEventListener('DOMContentLoaded', () => {
+        updateStats();
+    });
+</script>
+
+</body>
+</html>
